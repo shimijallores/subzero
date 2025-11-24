@@ -64,6 +64,7 @@ export default class GameScene extends Phaser.Scene {
     this.player.setOrigin(0.5);
     this.player.health = 100;
     this.player.maxHealth = 100;
+    this.player.lives = 3;
     this.player.isDebuffed = false;
     this.score = 0;
     this.lastFired = 0;
@@ -188,7 +189,7 @@ export default class GameScene extends Phaser.Scene {
       .setScrollFactor(0);
 
     this.hpText = this.add
-      .text(10, 50, "HP: 100%", {
+      .text(10, 50, "HP: 100% | LIVES: 3", {
         fontFamily: "Courier New, monospace",
         fontSize: "16px",
         color: COLORS.WHITE_STRING,
@@ -224,16 +225,77 @@ export default class GameScene extends Phaser.Scene {
     this.tabKey = this.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.TAB
     );
+
+    // Shield System
+    this.shield = {
+      active: false,
+      ready: true,
+      timer: 0,
+      duration: 5000,
+      cooldownTimer: 0,
+      cooldown: 15000,
+    };
+
+    this.shieldText = this.add
+      .text(10, 110, "SHIELD: READY [Q]", {
+        fontFamily: "Courier New, monospace",
+        fontSize: "16px",
+        color: COLORS.ACCENT_STRING,
+      })
+      .setScrollFactor(0);
+
+    this.qKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
+
+    // Shield Visual
+    this.shieldGfx = this.add.graphics();
+    this.shieldGfx.lineStyle(4, COLORS.ACCENT);
+    this.shieldGfx.strokeCircle(0, 0, 30);
+    this.shieldGfx.setVisible(false);
+
+    // Dash System
+    this.dash = {
+      active: false,
+      ready: true,
+      timer: 0,
+      duration: 200,
+      cooldownTimer: 0,
+      cooldown: 3000,
+      speed: 1000,
+    };
+
+    this.dashText = this.add
+      .text(10, 130, "DASH: READY [E]", {
+        fontFamily: "Courier New, monospace",
+        fontSize: "16px",
+        color: COLORS.ACCENT_STRING,
+      })
+      .setScrollFactor(0);
+
+    this.eKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
   }
 
   takeDamage(amount) {
+    if (this.shield.active) {
+      this.cameras.main.shake(20, 0.005); // Minor shake on deflect
+      return;
+    }
+
     this.player.health -= amount;
-    this.hpText.setText(`HP: ${this.player.health}%`);
+    this.hpText.setText(
+      `HP: ${this.player.health}% | LIVES: ${this.player.lives}`
+    );
     this.cameras.main.shake(100, 0.02);
     this.sound.play("damage", { volume: 0.6 });
 
     if (this.player.health <= 0) {
-      this.scene.restart();
+      this.player.lives--;
+      if (this.player.lives > 0) {
+        this.player.health = 100;
+        this.hpText.setText(`HP: 100% | LIVES: ${this.player.lives}`);
+        // Optional: Add temporary invulnerability or visual feedback here
+      } else {
+        this.scene.restart();
+      }
     }
   }
 
@@ -545,6 +607,105 @@ export default class GameScene extends Phaser.Scene {
       }
     }
 
+    // Shield Logic
+    if (Phaser.Input.Keyboard.JustDown(this.qKey)) {
+      if (this.shield.ready) {
+        this.shield.active = true;
+        this.shield.ready = false;
+        this.shield.timer = this.time.now + this.shield.duration;
+
+        this.shieldGfx.setVisible(true);
+        this.shieldText.setText("SHIELD: ACTIVE");
+        this.shieldText.setColor(COLORS.WHITE_STRING);
+      }
+    }
+
+    if (this.shield.active) {
+      this.shieldGfx.setPosition(this.player.x, this.player.y);
+      this.shieldGfx.rotation += 0.1; // Spin effect
+
+      if (this.time.now > this.shield.timer) {
+        this.shield.active = false;
+        this.shield.cooldownTimer = this.time.now + this.shield.cooldown;
+        this.shieldGfx.setVisible(false);
+
+        this.shieldText.setText("SHIELD: COOLDOWN");
+        this.shieldText.setColor(COLORS.WHITE_STRING);
+      }
+    } else if (!this.shield.ready) {
+      if (this.time.now > this.shield.cooldownTimer) {
+        this.shield.ready = true;
+        this.shieldText.setText("SHIELD: READY [Q]");
+        this.shieldText.setColor(COLORS.ACCENT_STRING);
+      } else {
+        const remaining = Math.ceil(
+          (this.shield.cooldownTimer - this.time.now) / 1000
+        );
+        this.shieldText.setText(`SHIELD: COOLDOWN (${remaining})`);
+      }
+    }
+
+    // Dash Logic
+    if (Phaser.Input.Keyboard.JustDown(this.eKey) && this.dash.ready) {
+      this.dash.active = true;
+      this.dash.ready = false;
+      this.dash.timer = this.time.now + this.dash.duration;
+      this.dash.cooldownTimer = this.time.now + this.dash.cooldown;
+
+      this.dashText.setText("DASH: ACTIVE");
+      this.dashText.setColor(COLORS.WHITE_STRING);
+
+      // Apply Dash Velocity (Towards Facing Direction)
+      const angle = this.player.rotation - Math.PI / 2;
+      this.player.body.setMaxVelocity(this.dash.speed);
+      this.physics.velocityFromRotation(
+        angle,
+        this.dash.speed,
+        this.player.body.velocity
+      );
+    }
+
+    if (this.dash.active) {
+      // Create trail effect
+      const ghost = this.add.triangle(
+        this.player.x,
+        this.player.y,
+        0,
+        20,
+        10,
+        0,
+        20,
+        20,
+        COLORS.WHITE
+      );
+      ghost.setOrigin(0.5);
+      ghost.rotation = this.player.rotation;
+      ghost.alpha = 0.5;
+      this.tweens.add({
+        targets: ghost,
+        alpha: 0,
+        duration: 200,
+        onComplete: () => ghost.destroy(),
+      });
+
+      if (this.time.now > this.dash.timer) {
+        this.dash.active = false;
+        this.player.body.setMaxVelocity(200); // Reset max velocity
+        this.dashText.setText("DASH: COOLDOWN");
+      }
+    } else if (!this.dash.ready) {
+      if (this.time.now > this.dash.cooldownTimer) {
+        this.dash.ready = true;
+        this.dashText.setText("DASH: READY [E]");
+        this.dashText.setColor(COLORS.ACCENT_STRING);
+      } else {
+        const remaining = Math.ceil(
+          (this.dash.cooldownTimer - this.time.now) / 1000
+        );
+        this.dashText.setText(`DASH: COOLDOWN (${remaining})`);
+      }
+    }
+
     // Spawner Logic
     this.spawnEntities();
 
@@ -575,33 +736,35 @@ export default class GameScene extends Phaser.Scene {
       Math.PI / 2;
 
     // Player Movement (Drift/Acceleration)
-    const acceleration = 800;
-    let accX = 0;
-    let accY = 0;
+    if (!this.dash.active) {
+      const acceleration = 800;
+      let accX = 0;
+      let accY = 0;
 
-    if (this.cursors.left.isDown || this.wasd.left.isDown) {
-      accX = -1;
-    } else if (this.cursors.right.isDown || this.wasd.right.isDown) {
-      accX = 1;
-    }
+      if (this.cursors.left.isDown || this.wasd.left.isDown) {
+        accX = -1;
+      } else if (this.cursors.right.isDown || this.wasd.right.isDown) {
+        accX = 1;
+      }
 
-    if (this.cursors.up.isDown || this.wasd.up.isDown) {
-      accY = -1;
-    } else if (this.cursors.down.isDown || this.wasd.down.isDown) {
-      accY = 1;
-    }
+      if (this.cursors.up.isDown || this.wasd.up.isDown) {
+        accY = -1;
+      } else if (this.cursors.down.isDown || this.wasd.down.isDown) {
+        accY = 1;
+      }
 
-    // Normalize acceleration
-    if (accX !== 0 || accY !== 0) {
-      const length = Math.sqrt(accX * accX + accY * accY);
-      this.player.body.setAcceleration(
-        (accX / length) * acceleration,
-        (accY / length) * acceleration
-      );
-      this.emitter.start();
-    } else {
-      this.player.body.setAcceleration(0, 0);
-      this.emitter.stop();
+      // Normalize acceleration
+      if (accX !== 0 || accY !== 0) {
+        const length = Math.sqrt(accX * accX + accY * accY);
+        this.player.body.setAcceleration(
+          (accX / length) * acceleration,
+          (accY / length) * acceleration
+        );
+        this.emitter.start();
+      } else {
+        this.player.body.setAcceleration(0, 0);
+        this.emitter.stop();
+      }
     }
 
     // Ghost flickers

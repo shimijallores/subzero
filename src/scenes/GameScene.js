@@ -122,6 +122,24 @@ export default class GameScene extends Phaser.Scene {
     });
 
     this.physics.add.overlap(this.bullets, this.enemies, (bullet, enemy) => {
+      // Overdrive Logic
+      if (bullet.isOverdrive) {
+        this.addScore(enemy.scoreValue || 100);
+        this.sound.play("enemy-hit", { volume: 0.5, rate: 1.5 }); // Higher pitch
+
+        // Boss handling
+        if (enemy.health) {
+          enemy.health -= 50; // Massive damage
+          enemy.setTint(COLORS.RED);
+          if (enemy.health <= 0) enemy.destroy();
+        } else {
+          enemy.destroy();
+        }
+
+        bullet.disableBody(true, true);
+        return;
+      }
+
       const killed = enemy.takeDamage(bullet.polarity);
       if (killed) {
         this.addScore(enemy.scoreValue || 100);
@@ -184,6 +202,28 @@ export default class GameScene extends Phaser.Scene {
         color: COLORS.WHITE_STRING,
       })
       .setScrollFactor(0);
+
+    // Overdrive System
+    this.overdrive = {
+      active: false,
+      ready: true,
+      timer: 0,
+      duration: 7000,
+      cooldownTimer: 0,
+      cooldown: 10000,
+    };
+
+    this.overdriveText = this.add
+      .text(10, 90, "OVERDRIVE: READY [TAB]", {
+        fontFamily: "Courier New, monospace",
+        fontSize: "16px",
+        color: COLORS.ACCENT_STRING,
+      })
+      .setScrollFactor(0);
+
+    this.tabKey = this.input.keyboard.addKey(
+      Phaser.Input.Keyboard.KeyCodes.TAB
+    );
   }
 
   takeDamage(amount) {
@@ -307,7 +347,7 @@ export default class GameScene extends Phaser.Scene {
     starFieldGfx.fillRect(0, 0, 512, 512);
     starFieldGfx.fillStyle(0xffffff, 0.5);
 
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 5; i++) {
       starFieldGfx.fillCircle(Math.random() * 512, Math.random() * 512, 1);
     }
     starFieldGfx.generateTexture("starfield1", 512, 512);
@@ -338,11 +378,24 @@ export default class GameScene extends Phaser.Scene {
         pointer.worldX,
         pointer.worldY
       );
-      bullet.fire(this.player.x, this.player.y, angle, true, polarity);
-      this.sound.play("laser", {
-        volume: 0.3,
-        detune: Math.random() * 200 - 100,
-      });
+
+      // Overdrive Override
+      if (this.overdrive.active) {
+        bullet.fire(this.player.x, this.player.y, angle, false, COLORS.RED);
+        bullet.isOverdrive = true;
+        this.sound.play("laser", {
+          volume: 0.4,
+          detune: 1200, // High pitch laser
+          rate: 2,
+        });
+      } else {
+        bullet.fire(this.player.x, this.player.y, angle, true, polarity);
+        bullet.isOverdrive = false;
+        this.sound.play("laser", {
+          volume: 0.3,
+          detune: Math.random() * 200 - 100,
+        });
+      }
     }
   }
 
@@ -446,6 +499,50 @@ export default class GameScene extends Phaser.Scene {
     if (this.bgLayer2) {
       this.bgLayer2.tilePositionX = this.cameras.main.scrollX * 0.3;
       this.bgLayer2.tilePositionY = this.cameras.main.scrollY * 0.3;
+    }
+
+    // Overdrive Logic
+    if (Phaser.Input.Keyboard.JustDown(this.tabKey)) {
+      if (this.overdrive.ready) {
+        this.overdrive.active = true;
+        this.overdrive.ready = false;
+        this.overdrive.timer = this.time.now + this.overdrive.duration;
+
+        // Visuals ON
+        this.cameras.main.setBackgroundColor("#330000"); // Dark Red BG
+        this.overdriveText.setText("OVERDRIVE: ACTIVE");
+        this.overdriveText.setColor(COLORS.RED_STRING);
+        this.fireRate = 50; // Machine Gun Speed
+      }
+    }
+
+    if (this.overdrive.active) {
+      // Shake screen constantly
+      this.cameras.main.shake(50, 0.005);
+
+      if (this.time.now > this.overdrive.timer) {
+        // Deactivate
+        this.overdrive.active = false;
+        this.overdrive.cooldownTimer = this.time.now + this.overdrive.cooldown;
+
+        // Visuals OFF
+        this.cameras.main.setBackgroundColor(COLORS.BLACK);
+        this.overdriveText.setText("OVERDRIVE: COOLDOWN");
+        this.overdriveText.setColor(COLORS.WHITE_STRING);
+        this.fireRate = 200; // Reset Speed
+      }
+    } else if (!this.overdrive.ready) {
+      // Cooldown Logic
+      if (this.time.now > this.overdrive.cooldownTimer) {
+        this.overdrive.ready = true;
+        this.overdriveText.setText("OVERDRIVE: READY [TAB]");
+        this.overdriveText.setColor(COLORS.ACCENT_STRING);
+      } else {
+        const remaining = Math.ceil(
+          (this.overdrive.cooldownTimer - this.time.now) / 1000
+        );
+        this.overdriveText.setText(`OVERDRIVE: COOLDOWN (${remaining})`);
+      }
     }
 
     // Spawner Logic

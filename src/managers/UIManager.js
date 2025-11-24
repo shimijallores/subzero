@@ -39,6 +39,28 @@ export default class UIManager {
       })
       .setScrollFactor(0);
 
+    // Round UI
+    this.roundText = this.scene.add
+      .text(width / 2, 30, "ROUND: 1 | TIME: 30", {
+        fontFamily: "Courier New, monospace",
+        fontSize: "20px",
+        color: COLORS.ACCENT_STRING,
+      })
+      .setOrigin(0.5)
+      .setScrollFactor(0);
+
+    this.nextRoundText = this.scene.add
+      .text(width / 2, height / 2, "ROUND 2", {
+        fontFamily: "Courier New, monospace",
+        fontSize: "64px",
+        color: COLORS.WHITE_STRING,
+        fontStyle: "bold",
+      })
+      .setOrigin(0.5)
+      .setScrollFactor(0)
+      .setAlpha(0)
+      .setDepth(200);
+
     // UI - Top Right
     this.hpText = this.scene.add
       .text(width - 10, 10, "HP: 100% | LIVES: 3", {
@@ -132,5 +154,31 @@ export default class UIManager {
   updateDashStatus(text, color) {
     this.dashText.setText(text);
     if (color) this.dashText.setColor(color);
+  }
+
+  updateRound(round, timeRemaining) {
+    const seconds = Math.ceil(timeRemaining / 1000);
+    this.roundText.setText(`ROUND: ${round} | TIME: ${seconds}`);
+  }
+
+  showNextRound(round) {
+    this.nextRoundText.setText(`ROUND ${round}`);
+    this.nextRoundText.setAlpha(1);
+    this.nextRoundText.setScale(0.5);
+
+    this.scene.tweens.add({
+      targets: this.nextRoundText,
+      scale: 1.2,
+      duration: 500,
+      ease: "Back.out",
+      onComplete: () => {
+        this.scene.tweens.add({
+          targets: this.nextRoundText,
+          alpha: 0,
+          delay: 1000,
+          duration: 500,
+        });
+      },
+    });
   }
 }

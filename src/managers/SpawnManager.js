@@ -9,6 +9,43 @@ export default class SpawnManager {
   constructor(scene) {
     this.scene = scene;
     this.bossActive = false;
+
+    // Round System
+    this.currentRound = 1;
+    this.roundTimer = 30000; // 30 seconds
+    this.roundDuration = 30000;
+    this.enemyCap = 5;
+    this.meteorCap = 10;
+  }
+
+  update(time, delta) {
+    this.roundTimer -= delta;
+
+    if (this.roundTimer <= 0) {
+      this.nextRound();
+    }
+
+    // Update UI
+    if (this.scene.uiManager) {
+      this.scene.uiManager.updateRound(this.currentRound, this.roundTimer);
+    }
+  }
+
+  nextRound() {
+    this.currentRound++;
+    this.roundTimer = this.roundDuration;
+
+    // Increase Difficulty
+    this.enemyCap = Math.floor(5 + this.currentRound * 1.5);
+    this.meteorCap = Math.floor(10 + this.currentRound * 0.5);
+
+    // Show UI
+    if (this.scene.uiManager) {
+      this.scene.uiManager.showNextRound(this.currentRound);
+    }
+
+    // Heal player slightly? Or maybe just score bonus?
+    this.scene.addScore(500 * this.currentRound);
   }
 
   spawn(player, prisms, enemies, meteors, score) {
@@ -26,12 +63,12 @@ export default class SpawnManager {
       prisms.add(new Prism(this.scene, pos.x, pos.y));
     }
 
-    if (meteors.countActive() < 10) {
+    if (meteors.countActive() < this.meteorCap) {
       const pos = this.getSpawnPos(playerPos);
       meteors.add(new Meteor(this.scene, pos.x, pos.y));
     }
 
-    if (enemies.countActive() < 5) {
+    if (enemies.countActive() < this.enemyCap) {
       const pos = this.getSpawnPos(playerPos);
       const rand = Math.random();
 

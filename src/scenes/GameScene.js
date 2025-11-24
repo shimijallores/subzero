@@ -135,6 +135,7 @@ export default class GameScene extends Phaser.Scene {
   update(time, delta) {
     this.backgroundManager.update();
     this.player.update(time, delta);
+    this.spawnManager.update(time, delta);
     this.spawnManager.spawn(
       this.player,
       this.prisms,

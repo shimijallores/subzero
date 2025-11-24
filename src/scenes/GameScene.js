@@ -10,6 +10,12 @@ export default class GameScene extends Phaser.Scene {
     super("GameScene");
   }
 
+  preload() {
+    this.load.audio("laser", "assets/sounds/laser.mp3");
+    this.load.audio("damage", "assets/sounds/damage.mp3");
+    this.load.audio("enemy-hit", "assets/sounds/enemy-hit.mp3");
+  }
+
   create() {
     // Generate Textures
     this.createTextures();
@@ -96,6 +102,7 @@ export default class GameScene extends Phaser.Scene {
       const killed = enemy.takeDamage(bullet.polarity);
       if (killed) {
         this.addScore(enemy.scoreValue || 100);
+        this.sound.play("enemy-hit", { volume: 0.5 });
       }
       bullet.disableBody(true, true); // Destroy bullet
     });
@@ -155,6 +162,7 @@ export default class GameScene extends Phaser.Scene {
     this.player.health -= amount;
     this.hpText.setText(`HP: ${this.player.health}%`);
     this.cameras.main.shake(100, 0.02);
+    this.sound.play("damage", { volume: 0.6 });
 
     if (this.player.health <= 0) {
       this.scene.restart();
@@ -228,6 +236,10 @@ export default class GameScene extends Phaser.Scene {
         pointer.worldY
       );
       bullet.fire(this.player.x, this.player.y, angle);
+      this.sound.play("laser", {
+        volume: 0.3,
+        detune: Math.random() * 200 - 100,
+      });
     }
   }
 

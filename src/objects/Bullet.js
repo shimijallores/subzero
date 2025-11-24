@@ -7,14 +7,16 @@ export default class Bullet extends Phaser.Physics.Arcade.Sprite {
     this.scene = scene;
     this.speed = 600;
     this.polarity = COLORS.WHITE;
+    this.canReflect = true;
     this.born = 0;
     this.lifespan = 2000; // ms
   }
 
-  fire(x, y, angle) {
+  fire(x, y, angle, canReflect = true) {
     this.enableBody(true, x, y, true, true);
     this.setTint(COLORS.WHITE);
     this.polarity = COLORS.WHITE;
+    this.canReflect = canReflect;
 
     // Physics
     this.scene.physics.velocityFromRotation(
@@ -28,6 +30,8 @@ export default class Bullet extends Phaser.Physics.Arcade.Sprite {
   }
 
   reflect() {
+    if (!this.canReflect) return;
+
     if (this.polarity === COLORS.WHITE) {
       this.polarity = COLORS.ACCENT;
       this.setTint(COLORS.ACCENT);

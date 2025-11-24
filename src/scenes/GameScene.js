@@ -4,6 +4,7 @@ import Prism from "../objects/Prism.js";
 import FluxStrider from "../objects/enemies/FluxStrider.js";
 import ChronoLoomer from "../objects/enemies/ChronoLoomer.js";
 import VoidSentinel from "../objects/enemies/VoidSentinel.js";
+import NegativeSpaceVoid from "../objects/enemies/NegativeSpaceVoid.js";
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -224,6 +225,27 @@ export default class GameScene extends Phaser.Scene {
     voidGfx.lineStyle(2, 0xffffff);
     voidGfx.strokeRect(16, 16, 32, 32);
     voidGfx.generateTexture("void-sentinel", 64, 64);
+
+    // Negative Space Void (Boss) - Icosahedron-ish
+    const bossGfx = this.make.graphics({ x: 0, y: 0, add: false });
+    bossGfx.lineStyle(4, 0xffffff);
+    // Outer Hexagon
+    bossGfx.strokePoints(
+      [
+        { x: 64, y: 0 },
+        { x: 120, y: 32 },
+        { x: 120, y: 96 },
+        { x: 64, y: 128 },
+        { x: 8, y: 96 },
+        { x: 8, y: 32 },
+        { x: 64, y: 0 },
+      ],
+      true
+    );
+    // Inner connections
+    bossGfx.lineStyle(2, COLORS.ACCENT);
+    bossGfx.strokeCircle(64, 64, 30);
+    bossGfx.generateTexture("negative-space-void", 128, 128);
   }
 
   fireBullet(pointer) {
@@ -283,7 +305,19 @@ export default class GameScene extends Phaser.Scene {
     if (this.enemies.countActive() < 5) {
       const pos = this.getSpawnPos(playerPos);
       const rand = Math.random();
-      if (rand < 0.6) {
+
+      // Boss Spawn Logic (Simple chance for now, or score based)
+      // Let's make it rare but possible for testing, or strictly score based
+      if (this.score > 1000 && !this.bossActive && Math.random() < 0.05) {
+        this.bossActive = true;
+        const boss = new NegativeSpaceVoid(this, pos.x, pos.y);
+        this.enemies.add(boss);
+
+        // Reset boss active flag when destroyed
+        boss.once("destroy", () => {
+          this.bossActive = false;
+        });
+      } else if (rand < 0.6) {
         this.enemies.add(new FluxStrider(this, pos.x, pos.y));
       } else if (rand < 0.9) {
         this.enemies.add(new ChronoLoomer(this, pos.x, pos.y));

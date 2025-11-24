@@ -51,7 +51,7 @@ export default class FluxStrider extends BaseEnemy {
     // Add to a group in scene if we want proper collision,
     // but for now let's just add a collider here for simplicity
     scene.physics.add.overlap(scene.player, pellet, (player, p) => {
-      scene.takeDamage(5);
+      player.takeDamage(5);
       p.destroy();
     });
 

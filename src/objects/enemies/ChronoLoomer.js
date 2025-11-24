@@ -35,9 +35,9 @@ export default class ChronoLoomer extends BaseEnemy {
     scene.physics.add.existing(trail, true); // Static body
 
     // Collision with player: Damage + Debuff
-    scene.physics.add.collider(scene.player, trail, () => {
-      scene.takeDamage(2);
-      scene.applyVelocityDebuff();
+    scene.physics.add.collider(scene.player, trail, (player) => {
+      player.takeDamage(2);
+      player.applyVelocityDebuff();
       trail.destroy();
     });
 

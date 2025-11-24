@@ -9,10 +9,9 @@ export default class BaseEnemy extends Phaser.Physics.Arcade.Sprite {
 
     this.setImmovable(true);
 
+    this.scoreValue = 100; // Default score
     this.polarity = COLORS.WHITE;
-    this.setTint(COLORS.WHITE);
-
-    // Polarity Swap Timer
+    this.setTint(COLORS.WHITE); // Polarity Swap Timer
     this.swapEvent = this.scene.time.addEvent({
       delay: 1500,
       callback: this.swapPolarity,

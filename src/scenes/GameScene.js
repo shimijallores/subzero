@@ -45,6 +45,12 @@ export default class GameScene extends Phaser.Scene {
       COLORS.WHITE
     );
     this.player.setOrigin(0.5);
+    this.player.health = 100;
+    this.player.maxHealth = 100;
+    this.player.isDebuffed = false;
+    this.score = 0;
+    this.lastFired = 0;
+    this.fireRate = 200; // ms between shots
 
     // Particles
     this.emitter = this.add.particles(0, 0, "particle", {
@@ -58,7 +64,7 @@ export default class GameScene extends Phaser.Scene {
 
     // Physics
     this.physics.add.existing(this.player);
-    this.player.body.setDrag(200);
+    this.player.body.setDrag(100);
     this.player.body.setMaxVelocity(200);
 
     // Camera
@@ -72,10 +78,6 @@ export default class GameScene extends Phaser.Scene {
       left: Phaser.Input.Keyboard.KeyCodes.A,
       right: Phaser.Input.Keyboard.KeyCodes.D,
       space: Phaser.Input.Keyboard.KeyCodes.SPACE,
-    });
-
-    this.input.on("pointerdown", (pointer) => {
-      this.fireBullet(pointer);
     });
 
     // Level Setup (Test)
@@ -93,9 +95,15 @@ export default class GameScene extends Phaser.Scene {
     this.physics.add.overlap(this.bullets, this.enemies, (bullet, enemy) => {
       const killed = enemy.takeDamage(bullet.polarity);
       if (killed) {
-        // Maybe spawn particles or something
+        this.addScore(enemy.scoreValue || 100);
       }
       bullet.disableBody(true, true); // Destroy bullet
+    });
+
+    // Player vs Enemies Collision
+    this.physics.add.overlap(this.player, this.enemies, (player, enemy) => {
+      this.takeDamage(10);
+      enemy.destroy();
     });
 
     // Time-Clone Ghost - Semi-transparent Accent Color Wireframe
@@ -125,6 +133,46 @@ export default class GameScene extends Phaser.Scene {
         color: COLORS.ACCENT_STRING,
       })
       .setScrollFactor(0);
+
+    this.hpText = this.add
+      .text(10, 50, "HP: 100%", {
+        fontFamily: "Courier New, monospace",
+        fontSize: "16px",
+        color: COLORS.WHITE_STRING,
+      })
+      .setScrollFactor(0);
+
+    this.scoreText = this.add
+      .text(10, 70, "SCORE: 0", {
+        fontFamily: "Courier New, monospace",
+        fontSize: "16px",
+        color: COLORS.WHITE_STRING,
+      })
+      .setScrollFactor(0);
+  }
+
+  takeDamage(amount) {
+    this.player.health -= amount;
+    this.hpText.setText(`HP: ${this.player.health}%`);
+    this.cameras.main.shake(100, 0.02);
+
+    if (this.player.health <= 0) {
+      this.scene.restart();
+    }
+  }
+
+  applyVelocityDebuff() {
+    if (this.player.isDebuffed) return;
+
+    this.player.isDebuffed = true;
+    this.player.body.setMaxVelocity(50);
+    this.hpText.setColor("#ff0000");
+
+    this.time.delayedCall(2000, () => {
+      this.player.isDebuffed = false;
+      this.player.body.setMaxVelocity(200); // Restore speed
+      this.hpText.setColor(COLORS.WHITE_STRING);
+    });
   }
 
   createTextures() {
@@ -247,12 +295,16 @@ export default class GameScene extends Phaser.Scene {
     // Spawner Logic
     this.spawnEntities();
 
+    // Auto-Fire Logic
+    if (this.input.activePointer.isDown) {
+      if (time > this.lastFired) {
+        this.fireBullet(this.input.activePointer);
+        this.lastFired = time + this.fireRate;
+      }
+    }
+
     // Player Rotation (Face Cursor)
     const pointer = this.input.activePointer;
-    // Adjust rotation offset if necessary (triangle points up by default? Phaser triangles usually point up or right)
-    // Phaser.GameObjects.Triangle default: point is at top? No, it's drawn with coords.
-    // In create: 0, 20, 10, 0, 20, 20. This is a triangle pointing UP (10,0 is top).
-    // Phaser rotation 0 is RIGHT. So we need to add 90 degrees (PI/2) to the angle.
     this.player.rotation =
       Phaser.Math.Angle.Between(
         this.player.x,
@@ -301,5 +353,10 @@ export default class GameScene extends Phaser.Scene {
     this.ghost.x = Phaser.Math.Linear(this.ghost.x, this.player.x, 0.1);
     this.ghost.y = Phaser.Math.Linear(this.ghost.y, this.player.y, 0.1);
     this.ghost.rotation = this.player.rotation;
+  }
+
+  addScore(points) {
+    this.score += points;
+    this.scoreText.setText(`SCORE: ${this.score}`);
   }
 }

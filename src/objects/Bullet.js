@@ -22,7 +22,6 @@ export default class Bullet extends Phaser.Physics.Arcade.Sprite {
       this.speed,
       this.body.velocity
     );
-    // this.body.setCollideWorldBounds(true); // Removed for infinite map
     this.body.setBounce(1);
 
     this.born = 0;
@@ -32,7 +31,6 @@ export default class Bullet extends Phaser.Physics.Arcade.Sprite {
     if (this.polarity === COLORS.WHITE) {
       this.polarity = COLORS.ACCENT;
       this.setTint(COLORS.ACCENT);
-      // Add trail effect here later
     }
   }
 

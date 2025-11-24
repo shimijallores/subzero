@@ -10,6 +10,7 @@ export default class FluxStrider extends BaseEnemy {
     this.setImmovable(false);
     this.body.setBounce(1);
     this.body.setDrag(100);
+    this.scoreValue = 100;
   }
 
   update(time, delta) {
@@ -33,5 +34,28 @@ export default class FluxStrider extends BaseEnemy {
     this.body.velocity.y += Math.sin(angle + Math.PI / 2) * sine;
 
     this.rotation = angle + Math.PI / 2;
+
+    // Shoot occasionally
+    if (Math.random() < 0.01) {
+      this.fire();
+    }
+  }
+
+  fire() {
+    const scene = this.scene;
+    // Simple pellet
+    const pellet = scene.add.rectangle(this.x, this.y, 4, 4, 0xffffff);
+    scene.physics.add.existing(pellet);
+    scene.physics.moveToObject(pellet, scene.player, 400);
+
+    // Add to a group in scene if we want proper collision,
+    // but for now let's just add a collider here for simplicity
+    scene.physics.add.overlap(scene.player, pellet, (player, p) => {
+      scene.takeDamage(5);
+      p.destroy();
+    });
+
+    // Destroy after 2 seconds
+    scene.time.delayedCall(2000, () => pellet.destroy());
   }
 }

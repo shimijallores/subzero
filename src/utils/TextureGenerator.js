@@ -47,6 +47,29 @@ export default class TextureGenerator {
     voidGfx.strokeRect(16, 16, 32, 32);
     voidGfx.generateTexture("void-sentinel", 64, 64);
 
+    // Kamikaze Texture
+    const kamikazeGfx = this.scene.make.graphics({ x: 0, y: 0, add: false });
+    kamikazeGfx.lineStyle(2, 0xffffff);
+    kamikazeGfx.strokeTriangle(16, 0, 32, 32, 0, 32);
+    kamikazeGfx.fillStyle(0xffffff);
+    kamikazeGfx.fillCircle(16, 16, 4); // Core
+    kamikazeGfx.generateTexture("kamikaze", 32, 32);
+
+    // Void Serpent Head
+    const serpentHeadGfx = this.scene.make.graphics({ x: 0, y: 0, add: false });
+    serpentHeadGfx.lineStyle(2, 0xffffff);
+    serpentHeadGfx.strokeCircle(24, 24, 20);
+    serpentHeadGfx.fillStyle(COLORS.ACCENT);
+    serpentHeadGfx.fillCircle(16, 16, 6);
+    serpentHeadGfx.fillCircle(32, 16, 6);
+    serpentHeadGfx.generateTexture("void-serpent-head", 48, 48);
+
+    // Void Serpent Body
+    const serpentBodyGfx = this.scene.make.graphics({ x: 0, y: 0, add: false });
+    serpentBodyGfx.lineStyle(2, 0xffffff);
+    serpentBodyGfx.strokeCircle(16, 16, 12);
+    serpentBodyGfx.generateTexture("void-serpent-body", 32, 32);
+
     // Negative Space Void (Boss) - Icosahedron
     const bossGfx = this.scene.make.graphics({ x: 0, y: 0, add: false });
     bossGfx.lineStyle(4, 0xffffff);

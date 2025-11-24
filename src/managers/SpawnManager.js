@@ -4,6 +4,8 @@ import FluxStrider from "../objects/enemies/FluxStrider.js";
 import ChronoLoomer from "../objects/enemies/ChronoLoomer.js";
 import VoidSentinel from "../objects/enemies/VoidSentinel.js";
 import NegativeSpaceVoid from "../objects/enemies/NegativeSpaceVoid.js";
+import KamikazeEnemy from "../objects/enemies/KamikazeEnemy.js";
+import VoidSerpent from "../objects/enemies/VoidSerpent.js";
 import Meteor from "../objects/Meteor.js";
 
 export default class SpawnManager {
@@ -75,17 +77,23 @@ export default class SpawnManager {
       // Boss Spawn Logic
       if (score > 1000 && !this.bossActive && Math.random() < 0.05) {
         this.bossActive = true;
-        const boss = new NegativeSpaceVoid(this.scene, pos.x, pos.y);
+
+        // Randomly choose between bosses
+        const bossType = Math.random() > 0.5 ? NegativeSpaceVoid : VoidSerpent;
+        const boss = new bossType(this.scene, pos.x, pos.y);
+
         enemies.add(boss);
 
         // Reset boss active flag when destroyed
         boss.once("destroy", () => {
           this.bossActive = false;
         });
-      } else if (rand < 0.6) {
+      } else if (rand < 0.5) {
         enemies.add(new FluxStrider(this.scene, pos.x, pos.y));
-      } else if (rand < 0.9) {
+      } else if (rand < 0.7) {
         enemies.add(new ChronoLoomer(this.scene, pos.x, pos.y));
+      } else if (rand < 0.85) {
+        enemies.add(new KamikazeEnemy(this.scene, pos.x, pos.y));
       } else {
         enemies.add(new VoidSentinel(this.scene, pos.x, pos.y));
       }

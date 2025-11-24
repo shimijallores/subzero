@@ -1,13 +1,25 @@
 import { COLORS } from "../consts/Colors.js";
+import ScoreManager from "../managers/ScoreManager.js";
 
 export default class MainMenuScene extends Phaser.Scene {
   constructor() {
     super("MainMenuScene");
   }
 
+  preload() {
+    this.load.audio("background", "assets/sounds/background.mp3");
+  }
+
   create() {
     const width = this.scale.width;
     const height = this.scale.height;
+
+    // Background Music
+    if (!this.sound.get("background")) {
+      this.sound.add("background", { volume: 0.5, loop: true }).play();
+    } else if (!this.sound.get("background").isPlaying) {
+      this.sound.get("background").play();
+    }
 
     // Background
     this.cameras.main.setBackgroundColor(COLORS.BLACK);
@@ -32,7 +44,7 @@ export default class MainMenuScene extends Phaser.Scene {
     const title = this.add
       .text(width / 2, height / 3 - 50, "SUBZERO", {
         fontFamily: "Courier New, monospace",
-        fontSize: "84px",
+        fontSize: "124px",
         color: COLORS.ACCENT_STRING,
         fontStyle: "bold",
       })
@@ -55,7 +67,7 @@ export default class MainMenuScene extends Phaser.Scene {
     this.nameInput = this.add.dom(width / 2, height / 2).createFromHTML(`
         <input type="text" name="nameField" placeholder="ENTER PILOT NAME" 
         style="font-family: 'Courier New', monospace; font-size: 24px; color: #00ffff; 
-        background-color: #000000; border: 2px solid #00ffff; padding: 10px; 
+        background-color: #000000; border: 2px solid #00ffff; padding: 5px; 
         text-align: center; width: 300px; outline: none;">
     `);
     this.nameInput.addListener("keydown");
@@ -93,8 +105,97 @@ export default class MainMenuScene extends Phaser.Scene {
     instrBtn.on("pointerout", () => instrBtn.setColor(COLORS.WHITE_STRING));
     instrBtn.on("pointerdown", () => this.toggleInstructions(true));
 
+    // Leaderboard Button
+    const leaderBtn = this.add
+      .text(width / 2, height / 2 + 200, "[ HALL OF FAME ]", {
+        fontFamily: "Courier New, monospace",
+        fontSize: "24px",
+        color: COLORS.WHITE_STRING,
+      })
+      .setOrigin(0.5)
+      .setInteractive({ useHandCursor: true });
+
+    leaderBtn.on("pointerover", () => leaderBtn.setColor(COLORS.ACCENT_STRING));
+    leaderBtn.on("pointerout", () => leaderBtn.setColor(COLORS.WHITE_STRING));
+    leaderBtn.on("pointerdown", () => this.toggleLeaderboard(true));
+
     // Instructions Panel (Hidden by default)
     this.createInstructionsPanel(width, height);
+
+    // Leaderboard Panel (Hidden by default)
+    this.createLeaderboardPanel(width, height);
+  }
+
+  createLeaderboardPanel(width, height) {
+    this.leaderContainer = this.add
+      .container(0, 0)
+      .setVisible(false)
+      .setDepth(100);
+
+    // Dark overlay
+    const bg = this.add.rectangle(
+      width / 2,
+      height / 2,
+      width,
+      height,
+      0x000000,
+      0.9
+    );
+
+    const title = this.add
+      .text(width / 2, 100, "HALL OF FAME", {
+        fontFamily: "Courier New, monospace",
+        fontSize: "32px",
+        color: COLORS.ACCENT_STRING,
+      })
+      .setOrigin(0.5);
+
+    // Get scores
+    const scoreManager = new ScoreManager();
+    const scores = scoreManager.getHighScores();
+
+    let content = "";
+    if (scores.length === 0) {
+      content = "NO DATA FOUND";
+    } else {
+      scores.forEach((entry, index) => {
+        content += `${index + 1}. ${entry.name} - ${entry.score}\n`;
+      });
+    }
+
+    const text = this.add
+      .text(width / 2, height / 2, content, {
+        fontFamily: "Courier New, monospace",
+        fontSize: "24px",
+        color: COLORS.WHITE_STRING,
+        align: "center",
+        lineSpacing: 10,
+      })
+      .setOrigin(0.5);
+
+    const closeBtn = this.add
+      .text(width / 2, height - 100, "[ CLOSE ]", {
+        fontFamily: "Courier New, monospace",
+        fontSize: "24px",
+        color: COLORS.RED_STRING,
+      })
+      .setOrigin(0.5)
+      .setInteractive({ useHandCursor: true });
+
+    closeBtn.on("pointerdown", () => this.toggleLeaderboard(false));
+    closeBtn.on("pointerover", () => closeBtn.setColor(COLORS.WHITE_STRING));
+    closeBtn.on("pointerout", () => closeBtn.setColor(COLORS.RED_STRING));
+
+    this.leaderContainer.add([bg, title, text, closeBtn]);
+  }
+
+  toggleLeaderboard(show) {
+    this.leaderContainer.setVisible(show);
+    if (show) {
+      this.nameInput.setVisible(false);
+    } else {
+      this.nameInput.setVisible(true);
+    }
   }
 
   createInstructionsPanel(width, height) {

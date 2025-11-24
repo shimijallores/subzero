@@ -1,8 +1,18 @@
 import { COLORS } from "../consts/Colors.js";
+import ScoreManager from "../managers/ScoreManager.js";
 
 export default class GameOverScene extends Phaser.Scene {
   constructor() {
     super("GameOverScene");
+  }
+
+  init(data) {
+    this.score = data.score || 0;
+    this.playerName = data.playerName || "UNKNOWN";
+
+    // Save score
+    const scoreManager = new ScoreManager();
+    scoreManager.saveScore(this.playerName, this.score);
   }
 
   create() {
@@ -21,10 +31,10 @@ export default class GameOverScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     this.add
-      .text(width / 2, height / 2, "SIGNAL LOST...", {
+      .text(width / 2, height / 2, `SCORE: ${this.score}`, {
         fontFamily: "Courier New, monospace",
-        fontSize: "24px",
-        color: COLORS.WHITE_STRING,
+        fontSize: "32px",
+        color: COLORS.ACCENT_STRING,
       })
       .setOrigin(0.5);
 

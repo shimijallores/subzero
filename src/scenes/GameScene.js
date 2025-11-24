@@ -36,8 +36,15 @@ export default class GameScene extends Phaser.Scene {
     this.backgroundManager.create();
 
     // Music
-    this.music = this.sound.add("background", { volume: 0.5, loop: true });
-    this.music.play();
+    if (!this.sound.get("background")) {
+      this.music = this.sound.add("background", { volume: 0.5, loop: true });
+      this.music.play();
+    } else {
+      this.music = this.sound.get("background");
+      if (!this.music.isPlaying) {
+        this.music.play();
+      }
+    }
 
     // Groups
     this.bullets = this.physics.add.group({
@@ -162,7 +169,10 @@ export default class GameScene extends Phaser.Scene {
 
     if (this.player.lives <= 0) {
       this.music.stop();
-      this.scene.start("GameOverScene");
+      this.scene.start("GameOverScene", {
+        score: this.score,
+        playerName: this.playerName,
+      });
     }
   }
 

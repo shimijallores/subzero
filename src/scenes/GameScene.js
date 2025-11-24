@@ -171,7 +171,10 @@ export default class GameScene extends Phaser.Scene {
     this.ghost.x = 350;
     this.ghost.y = 290; // Offset slightly
 
-    // Add some text to verify font style (Monospace)
+    const width = this.scale.width;
+    const height = this.scale.height;
+
+    // UI - Top Left
     this.add
       .text(10, 10, "SYSTEM: ZERO-K // EPOCH ECHO", {
         fontFamily: "Courier New, monospace",
@@ -188,20 +191,22 @@ export default class GameScene extends Phaser.Scene {
       })
       .setScrollFactor(0);
 
-    this.hpText = this.add
-      .text(10, 50, "HP: 100% | LIVES: 3", {
+    this.scoreText = this.add
+      .text(10, 50, "SCORE: 0", {
         fontFamily: "Courier New, monospace",
         fontSize: "16px",
         color: COLORS.WHITE_STRING,
       })
       .setScrollFactor(0);
 
-    this.scoreText = this.add
-      .text(10, 70, "SCORE: 0", {
+    // UI - Top Right
+    this.hpText = this.add
+      .text(width - 10, 10, "HP: 100% | LIVES: 3", {
         fontFamily: "Courier New, monospace",
         fontSize: "16px",
         color: COLORS.WHITE_STRING,
       })
+      .setOrigin(1, 0)
       .setScrollFactor(0);
 
     // Overdrive System
@@ -214,12 +219,18 @@ export default class GameScene extends Phaser.Scene {
       cooldown: 10000,
     };
 
+    // UI - Bottom Right (Skills)
+    // Overdrive
+    this.add
+      .image(width - 26, height - 100, "icon-overdrive")
+      .setScrollFactor(0);
     this.overdriveText = this.add
-      .text(10, 90, "OVERDRIVE: READY [TAB]", {
+      .text(width - 50, height - 100, "READY [TAB]", {
         fontFamily: "Courier New, monospace",
         fontSize: "16px",
         color: COLORS.ACCENT_STRING,
       })
+      .setOrigin(1, 0.5)
       .setScrollFactor(0);
 
     this.tabKey = this.input.keyboard.addKey(
@@ -236,12 +247,15 @@ export default class GameScene extends Phaser.Scene {
       cooldown: 15000,
     };
 
+    // Shield
+    this.add.image(width - 26, height - 60, "icon-shield").setScrollFactor(0);
     this.shieldText = this.add
-      .text(10, 110, "SHIELD: READY [Q]", {
+      .text(width - 50, height - 60, "READY [Q]", {
         fontFamily: "Courier New, monospace",
         fontSize: "16px",
         color: COLORS.ACCENT_STRING,
       })
+      .setOrigin(1, 0.5)
       .setScrollFactor(0);
 
     this.qKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
@@ -263,12 +277,15 @@ export default class GameScene extends Phaser.Scene {
       speed: 1000,
     };
 
+    // Dash
+    this.add.image(width - 26, height - 20, "icon-dash").setScrollFactor(0);
     this.dashText = this.add
-      .text(10, 130, "DASH: READY [E]", {
+      .text(width - 50, height - 20, "READY [E]", {
         fontFamily: "Courier New, monospace",
         fontSize: "16px",
         color: COLORS.ACCENT_STRING,
       })
+      .setOrigin(1, 0.5)
       .setScrollFactor(0);
 
     this.eKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
@@ -397,6 +414,31 @@ export default class GameScene extends Phaser.Scene {
     starGfx.fillStyle(0xffffff);
     starGfx.fillCircle(1, 1, 1);
     starGfx.generateTexture("star", 2, 2);
+
+    // UI Icons
+    // Overdrive (Square)
+    const odIcon = this.make.graphics({ x: 0, y: 0, add: false });
+    odIcon.lineStyle(2, COLORS.RED);
+    odIcon.strokeRect(4, 4, 24, 24);
+    odIcon.fillStyle(COLORS.RED, 0.5);
+    odIcon.fillRect(4, 4, 24, 24);
+    odIcon.generateTexture("icon-overdrive", 32, 32);
+
+    // Shield (Circle)
+    const shieldIcon = this.make.graphics({ x: 0, y: 0, add: false });
+    shieldIcon.lineStyle(2, COLORS.ACCENT);
+    shieldIcon.strokeCircle(16, 16, 12);
+    shieldIcon.fillStyle(COLORS.ACCENT, 0.5);
+    shieldIcon.fillCircle(16, 16, 12);
+    shieldIcon.generateTexture("icon-shield", 32, 32);
+
+    // Dash (Triangle)
+    const dashIcon = this.make.graphics({ x: 0, y: 0, add: false });
+    dashIcon.lineStyle(2, COLORS.WHITE);
+    dashIcon.strokeTriangle(16, 4, 28, 28, 4, 28);
+    dashIcon.fillStyle(COLORS.WHITE, 0.5);
+    dashIcon.fillTriangle(16, 4, 28, 28, 4, 28);
+    dashIcon.generateTexture("icon-dash", 32, 32);
   }
 
   createBackground() {
@@ -572,7 +614,7 @@ export default class GameScene extends Phaser.Scene {
 
         // Visuals ON
         this.cameras.main.setBackgroundColor("#330000"); // Dark Red BG
-        this.overdriveText.setText("OVERDRIVE: ACTIVE");
+        this.overdriveText.setText("ACTIVE");
         this.overdriveText.setColor(COLORS.RED_STRING);
         this.fireRate = 50; // Machine Gun Speed
       }
@@ -589,7 +631,7 @@ export default class GameScene extends Phaser.Scene {
 
         // Visuals OFF
         this.cameras.main.setBackgroundColor(COLORS.BLACK);
-        this.overdriveText.setText("OVERDRIVE: COOLDOWN");
+        this.overdriveText.setText("COOLDOWN");
         this.overdriveText.setColor(COLORS.WHITE_STRING);
         this.fireRate = 200; // Reset Speed
       }
@@ -597,13 +639,13 @@ export default class GameScene extends Phaser.Scene {
       // Cooldown Logic
       if (this.time.now > this.overdrive.cooldownTimer) {
         this.overdrive.ready = true;
-        this.overdriveText.setText("OVERDRIVE: READY [TAB]");
+        this.overdriveText.setText("READY [TAB]");
         this.overdriveText.setColor(COLORS.ACCENT_STRING);
       } else {
         const remaining = Math.ceil(
           (this.overdrive.cooldownTimer - this.time.now) / 1000
         );
-        this.overdriveText.setText(`OVERDRIVE: COOLDOWN (${remaining})`);
+        this.overdriveText.setText(`COOLDOWN (${remaining})`);
       }
     }
 
@@ -615,7 +657,7 @@ export default class GameScene extends Phaser.Scene {
         this.shield.timer = this.time.now + this.shield.duration;
 
         this.shieldGfx.setVisible(true);
-        this.shieldText.setText("SHIELD: ACTIVE");
+        this.shieldText.setText("ACTIVE");
         this.shieldText.setColor(COLORS.WHITE_STRING);
       }
     }
@@ -629,19 +671,19 @@ export default class GameScene extends Phaser.Scene {
         this.shield.cooldownTimer = this.time.now + this.shield.cooldown;
         this.shieldGfx.setVisible(false);
 
-        this.shieldText.setText("SHIELD: COOLDOWN");
+        this.shieldText.setText("COOLDOWN");
         this.shieldText.setColor(COLORS.WHITE_STRING);
       }
     } else if (!this.shield.ready) {
       if (this.time.now > this.shield.cooldownTimer) {
         this.shield.ready = true;
-        this.shieldText.setText("SHIELD: READY [Q]");
+        this.shieldText.setText("READY [Q]");
         this.shieldText.setColor(COLORS.ACCENT_STRING);
       } else {
         const remaining = Math.ceil(
           (this.shield.cooldownTimer - this.time.now) / 1000
         );
-        this.shieldText.setText(`SHIELD: COOLDOWN (${remaining})`);
+        this.shieldText.setText(`COOLDOWN (${remaining})`);
       }
     }
 
@@ -652,7 +694,7 @@ export default class GameScene extends Phaser.Scene {
       this.dash.timer = this.time.now + this.dash.duration;
       this.dash.cooldownTimer = this.time.now + this.dash.cooldown;
 
-      this.dashText.setText("DASH: ACTIVE");
+      this.dashText.setText("ACTIVE");
       this.dashText.setColor(COLORS.WHITE_STRING);
 
       // Apply Dash Velocity (Towards Facing Direction)
@@ -691,18 +733,18 @@ export default class GameScene extends Phaser.Scene {
       if (this.time.now > this.dash.timer) {
         this.dash.active = false;
         this.player.body.setMaxVelocity(200); // Reset max velocity
-        this.dashText.setText("DASH: COOLDOWN");
+        this.dashText.setText("COOLDOWN");
       }
     } else if (!this.dash.ready) {
       if (this.time.now > this.dash.cooldownTimer) {
         this.dash.ready = true;
-        this.dashText.setText("DASH: READY [E]");
+        this.dashText.setText("READY [E]");
         this.dashText.setColor(COLORS.ACCENT_STRING);
       } else {
         const remaining = Math.ceil(
           (this.dash.cooldownTimer - this.time.now) / 1000
         );
-        this.dashText.setText(`DASH: COOLDOWN (${remaining})`);
+        this.dashText.setText(`COOLDOWN (${remaining})`);
       }
     }
 

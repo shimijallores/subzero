@@ -5,6 +5,7 @@ import FluxStrider from "../objects/enemies/FluxStrider.js";
 import ChronoLoomer from "../objects/enemies/ChronoLoomer.js";
 import VoidSentinel from "../objects/enemies/VoidSentinel.js";
 import NegativeSpaceVoid from "../objects/enemies/NegativeSpaceVoid.js";
+import Meteor from "../objects/Meteor.js";
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -26,6 +27,7 @@ export default class GameScene extends Phaser.Scene {
 
     // Background - Absolute Void
     this.cameras.main.setBackgroundColor(COLORS.BLACK);
+    this.createBackground();
 
     // Groups
     this.bullets = this.physics.add.group({
@@ -39,6 +41,11 @@ export default class GameScene extends Phaser.Scene {
     });
 
     this.enemies = this.physics.add.group({
+      runChildUpdate: true,
+    });
+
+    this.meteors = this.physics.add.group({
+      classType: Meteor,
       runChildUpdate: true,
     });
 
@@ -105,6 +112,15 @@ export default class GameScene extends Phaser.Scene {
       bullet.reflect();
     });
 
+    this.physics.add.overlap(this.bullets, this.meteors, (bullet, meteor) => {
+      const killed = meteor.takeDamage(10);
+      if (killed) {
+        this.addScore(meteor.scoreValue);
+        this.sound.play("enemy-hit", { volume: 0.5 });
+      }
+      bullet.disableBody(true, true);
+    });
+
     this.physics.add.overlap(this.bullets, this.enemies, (bullet, enemy) => {
       const killed = enemy.takeDamage(bullet.polarity);
       if (killed) {
@@ -118,6 +134,11 @@ export default class GameScene extends Phaser.Scene {
     this.physics.add.overlap(this.player, this.enemies, (player, enemy) => {
       this.takeDamage(10);
       enemy.destroy();
+    });
+
+    this.physics.add.overlap(this.player, this.meteors, (player, meteor) => {
+      this.takeDamage(20);
+      meteor.destroy();
     });
 
     // Time-Clone Ghost - Semi-transparent Accent Color Wireframe
@@ -185,7 +206,7 @@ export default class GameScene extends Phaser.Scene {
 
     this.time.delayedCall(2000, () => {
       this.player.isDebuffed = false;
-      this.player.body.setMaxVelocity(200); // Restore speed
+      this.player.body.setMaxVelocity(200);
       this.hpText.setColor(COLORS.WHITE_STRING);
     });
   }
@@ -252,6 +273,60 @@ export default class GameScene extends Phaser.Scene {
     bossGfx.lineStyle(2, COLORS.ACCENT);
     bossGfx.strokeCircle(64, 64, 30);
     bossGfx.generateTexture("negative-space-void", 128, 128);
+
+    // Meteor Texture (Jagged Rock)
+    const meteorGfx = this.make.graphics({ x: 0, y: 0, add: false });
+    meteorGfx.lineStyle(2, 0x888888);
+    meteorGfx.strokePoints(
+      [
+        { x: 16, y: 0 },
+        { x: 32, y: 10 },
+        { x: 24, y: 28 },
+        { x: 8, y: 32 },
+        { x: 0, y: 16 },
+        { x: 16, y: 0 },
+      ],
+      true
+    );
+    meteorGfx.generateTexture("meteor", 32, 32);
+
+    // Star Texture
+    const starGfx = this.make.graphics({ x: 0, y: 0, add: false });
+    starGfx.fillStyle(0xffffff);
+    starGfx.fillCircle(1, 1, 1);
+    starGfx.generateTexture("star", 2, 2);
+  }
+
+  createBackground() {
+    // Create TileSprites for infinite scrolling stars
+    // We need a texture that repeats. The 'star' texture is 2x2.
+    // Let's create a larger texture with random stars on it for the TileSprite
+
+    const starFieldGfx = this.make.graphics({ x: 0, y: 0, add: false });
+    starFieldGfx.fillStyle(0x000000, 0); // Transparent background
+    starFieldGfx.fillRect(0, 0, 512, 512);
+    starFieldGfx.fillStyle(0xffffff, 0.5);
+
+    for (let i = 0; i < 10; i++) {
+      starFieldGfx.fillCircle(Math.random() * 512, Math.random() * 512, 1);
+    }
+    starFieldGfx.generateTexture("starfield1", 512, 512);
+
+    const starFieldGfx2 = this.make.graphics({ x: 0, y: 0, add: false });
+    starFieldGfx2.fillStyle(0xffffff, 1);
+    for (let i = 0; i < 5; i++) {
+      starFieldGfx2.fillCircle(Math.random() * 512, Math.random() * 512, 1.5);
+    }
+    starFieldGfx2.generateTexture("starfield2", 512, 512);
+
+    // Add TileSprites fixed to camera
+    this.bgLayer1 = this.add.tileSprite(400, 300, 800, 600, "starfield1");
+    this.bgLayer1.setScrollFactor(0);
+    this.bgLayer1.setDepth(-10);
+
+    this.bgLayer2 = this.add.tileSprite(400, 300, 800, 600, "starfield2");
+    this.bgLayer2.setScrollFactor(0);
+    this.bgLayer2.setDepth(-9);
   }
 
   fireBullet(pointer, polarity = COLORS.WHITE) {
@@ -302,10 +377,28 @@ export default class GameScene extends Phaser.Scene {
       }
     });
 
+    this.meteors.getChildren().forEach((meteor) => {
+      if (
+        Phaser.Math.Distance.Between(
+          meteor.x,
+          meteor.y,
+          playerPos.x,
+          playerPos.y
+        ) > 1500
+      ) {
+        meteor.destroy();
+      }
+    });
+
     // Spawn new ones if count is low
     if (this.prisms.countActive() < 5) {
       const pos = this.getSpawnPos(playerPos);
       this.prisms.add(new Prism(this, pos.x, pos.y));
+    }
+
+    if (this.meteors.countActive() < 10) {
+      const pos = this.getSpawnPos(playerPos);
+      this.meteors.add(new Meteor(this, pos.x, pos.y));
     }
 
     if (this.enemies.countActive() < 5) {
@@ -344,6 +437,17 @@ export default class GameScene extends Phaser.Scene {
   }
 
   update(time, delta) {
+    // Let's fix the starfield logic to be simpler:
+    // We'll just use a large TileSprite that covers the screen and set its tilePosition
+    if (this.bgLayer1) {
+      this.bgLayer1.tilePositionX = this.cameras.main.scrollX * 0.1;
+      this.bgLayer1.tilePositionY = this.cameras.main.scrollY * 0.1;
+    }
+    if (this.bgLayer2) {
+      this.bgLayer2.tilePositionX = this.cameras.main.scrollX * 0.3;
+      this.bgLayer2.tilePositionY = this.cameras.main.scrollY * 0.3;
+    }
+
     // Spawner Logic
     this.spawnEntities();
 

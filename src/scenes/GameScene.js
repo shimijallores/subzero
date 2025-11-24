@@ -61,10 +61,13 @@ export default class GameScene extends Phaser.Scene {
 
     // Particles
     this.emitter = this.add.particles(0, 0, "particle", {
-      lifespan: 300,
-      speed: 0,
-      scale: { start: 1, end: 0 },
+      lifespan: 600,
+      speed: { min: 10, max: 50 },
+      angle: { min: 0, max: 360 },
+      scale: { start: 0.8, end: 0 },
+      alpha: { start: 0.6, end: 0 },
       blendMode: "ADD",
+      frequency: 10,
       emitting: false,
     });
     this.emitter.startFollow(this.player);
@@ -185,11 +188,11 @@ export default class GameScene extends Phaser.Scene {
   }
 
   createTextures() {
-    // Bullet Texture
+    // Bullet Texture (Laser-like)
     const bulletGfx = this.make.graphics({ x: 0, y: 0, add: false });
     bulletGfx.fillStyle(0xffffff);
-    bulletGfx.fillRect(0, 0, 8, 8);
-    bulletGfx.generateTexture("bullet", 8, 8);
+    bulletGfx.fillRect(0, 0, 24, 4); // Long and thin
+    bulletGfx.generateTexture("bullet", 24, 4);
 
     // Prism Texture (Diamond)
     const prismGfx = this.make.graphics({ x: 0, y: 0, add: false });
@@ -198,11 +201,11 @@ export default class GameScene extends Phaser.Scene {
     // We'll rotate the sprite, not the texture drawing
     prismGfx.generateTexture("prism", 32, 32);
 
-    // Particle Texture
+    // Particle Texture (Soft Glow)
     const particleGfx = this.make.graphics({ x: 0, y: 0, add: false });
     particleGfx.fillStyle(COLORS.WHITE);
-    particleGfx.fillRect(0, 0, 4, 4);
-    particleGfx.generateTexture("particle", 4, 4);
+    particleGfx.fillCircle(4, 4, 4);
+    particleGfx.generateTexture("particle", 8, 8);
 
     // Flux Strider Texture (Triangle Cluster)
     const fluxGfx = this.make.graphics({ x: 0, y: 0, add: false });

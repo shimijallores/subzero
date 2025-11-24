@@ -18,6 +18,9 @@ export default class Bullet extends Phaser.Physics.Arcade.Sprite {
     this.polarity = COLORS.WHITE;
     this.canReflect = canReflect;
 
+    // Rotate bullet to face direction
+    this.rotation = angle;
+
     // Physics
     this.scene.physics.velocityFromRotation(
       angle,

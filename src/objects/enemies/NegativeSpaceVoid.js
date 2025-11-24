@@ -1,3 +1,4 @@
+// Boss enemy with high health and unique behavior.
 import { COLORS } from "../../consts/Colors.js";
 import BaseEnemy from "./BaseEnemy.js";
 

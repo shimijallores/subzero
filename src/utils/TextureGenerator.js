@@ -1,3 +1,4 @@
+// Generates game assets programmatically using Phaser Graphics.
 import { COLORS } from "../consts/Colors.js";
 
 export default class TextureGenerator {
@@ -6,39 +7,39 @@ export default class TextureGenerator {
   }
 
   generate() {
-    // Bullet Texture (Laser-like)
+    // Bullet Texture
     const bulletGfx = this.scene.make.graphics({ x: 0, y: 0, add: false });
     bulletGfx.fillStyle(0xffffff);
     bulletGfx.fillRect(0, 0, 24, 4); // Long and thin
     bulletGfx.generateTexture("bullet", 24, 4);
 
-    // Prism Texture (Diamond)
+    // Prism Texture
     const prismGfx = this.scene.make.graphics({ x: 0, y: 0, add: false });
     prismGfx.lineStyle(2, 0xffffff);
     prismGfx.strokeRect(0, 0, 32, 32);
     prismGfx.generateTexture("prism", 32, 32);
 
-    // Particle Texture (Soft Glow)
+    // Particle Texture
     const particleGfx = this.scene.make.graphics({ x: 0, y: 0, add: false });
     particleGfx.fillStyle(COLORS.WHITE);
     particleGfx.fillCircle(4, 4, 4);
     particleGfx.generateTexture("particle", 8, 8);
 
-    // Flux Strider Texture (Triangle Cluster)
+    // Flux Strider Texture
     const fluxGfx = this.scene.make.graphics({ x: 0, y: 0, add: false });
     fluxGfx.lineStyle(2, 0xffffff);
     fluxGfx.strokeTriangle(0, 20, 10, 0, 20, 20);
     fluxGfx.strokeTriangle(10, 20, 20, 0, 30, 20);
     fluxGfx.generateTexture("flux-strider", 32, 32);
 
-    // Chrono Loomer Texture (Segmented)
+    // Chrono Loomer Texture
     const chronoGfx = this.scene.make.graphics({ x: 0, y: 0, add: false });
     chronoGfx.lineStyle(2, 0xffffff);
     chronoGfx.strokeCircle(16, 16, 14);
     chronoGfx.strokeRect(10, 10, 12, 12);
     chronoGfx.generateTexture("chrono-loomer", 32, 32);
 
-    // Void Sentinel Texture (Large Hollow)
+    // Void Sentinel Texture
     const voidGfx = this.scene.make.graphics({ x: 0, y: 0, add: false });
     voidGfx.lineStyle(4, 0xffffff);
     voidGfx.strokeRect(0, 0, 64, 64);
@@ -46,7 +47,7 @@ export default class TextureGenerator {
     voidGfx.strokeRect(16, 16, 32, 32);
     voidGfx.generateTexture("void-sentinel", 64, 64);
 
-    // Negative Space Void (Boss) - Icosahedron-ish
+    // Negative Space Void (Boss) - Icosahedron
     const bossGfx = this.scene.make.graphics({ x: 0, y: 0, add: false });
     bossGfx.lineStyle(4, 0xffffff);
     // Outer Hexagon
@@ -67,7 +68,7 @@ export default class TextureGenerator {
     bossGfx.strokeCircle(64, 64, 30);
     bossGfx.generateTexture("negative-space-void", 128, 128);
 
-    // Meteor Texture (Jagged Rock)
+    // Meteor Texture
     const meteorGfx = this.scene.make.graphics({ x: 0, y: 0, add: false });
     meteorGfx.lineStyle(2, 0x888888);
     meteorGfx.strokePoints(
@@ -89,7 +90,6 @@ export default class TextureGenerator {
     starGfx.fillCircle(1, 1, 1);
     starGfx.generateTexture("star", 2, 2);
 
-    // UI Icons
     // Overdrive (Square)
     const odIcon = this.scene.make.graphics({ x: 0, y: 0, add: false });
     odIcon.lineStyle(2, COLORS.RED);

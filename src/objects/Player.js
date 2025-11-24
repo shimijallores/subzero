@@ -1,3 +1,4 @@
+// Controls the player ship, movement, shooting, and skills.
 import { COLORS } from "../consts/Colors.js";
 
 export default class Player extends Phaser.GameObjects.Triangle {

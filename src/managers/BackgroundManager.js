@@ -1,3 +1,4 @@
+// Manages the scrolling starfield background layers.
 import { COLORS } from "../consts/Colors.js";
 
 export default class BackgroundManager {
@@ -8,12 +9,12 @@ export default class BackgroundManager {
   }
 
   create() {
-    // Background - Absolute Void
+    // Background
     this.scene.cameras.main.setBackgroundColor(COLORS.BLACK);
 
     // Create TileSprites for infinite scrolling stars
     const starFieldGfx = this.scene.make.graphics({ x: 0, y: 0, add: false });
-    starFieldGfx.fillStyle(0x000000, 0); // Transparent background
+    starFieldGfx.fillStyle(0x000000, 0);
     starFieldGfx.fillRect(0, 0, 512, 512);
     starFieldGfx.fillStyle(0xffffff, 0.5);
 

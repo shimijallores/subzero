@@ -1,3 +1,4 @@
+// Abstract base class for all enemy types.
 import { COLORS } from "../../consts/Colors.js";
 
 export default class BaseEnemy extends Phaser.Physics.Arcade.Sprite {

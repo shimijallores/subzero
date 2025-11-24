@@ -1,3 +1,4 @@
+// Scene displayed when the player runs out of lives.
 import { COLORS } from "../consts/Colors.js";
 import ScoreManager from "../managers/ScoreManager.js";
 

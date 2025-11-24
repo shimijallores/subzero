@@ -1,46 +1,24 @@
-# ZERO-K / EPOCH ECHO
+# SUBZERO
 
-A high-speed, vector-based space shooter set in a collapsing singularity.
+A high-speed, polarity-switching space shooter.
 
 ## 🎮 Controls
 
-- **Movement**: `WASD` or `Arrow Keys` (Physics-based drift system)
-- **Aim**: Mouse Cursor
-- **Fire White**: `Left Mouse Button`
-- **Fire Cyan**: `Right Mouse Button`
+- **Move**: `WASD` or `Arrow Keys`
+- **Aim**: Mouse
+- **Fire (White)**: `Left Click`
+- **Fire (Cyan)**: `Right Click`
+- **Skills**:
+  - `TAB`: Overdrive (Rapid Fire)
+  - `Q`: Shield
+  - `E`: Dash
 
 ## ⚔️ Mechanics
 
-### Polarity System
+- **Polarity**: Match bullet color to enemy color to deal damage.
+- **Survival**: Survive infinite rounds of increasing difficulty.
+- **Leaderboard**: Compete for the top score.
 
-The core combat mechanic revolves around **Polarity Matching**.
+## 🛠️ Tech
 
-- **White Bullets**: Effective against **White** enemies.
-- **Cyan (Accent) Bullets**: Effective against **Cyan** enemies.
-- **Enemies**: Most enemies will phase-shift between White and Cyan polarities. You must switch your fire mode to match their current state.
-
-### The Void
-
-- **Infinite Map**: The world generates endlessly around you.
-- **Drift**: Your ship has inertia. Master the drift to dodge effectively.
-- **Ghost**: A time-echo follows your movement, representing your past position.
-
-## 👾 Enemies
-
-- **Flux Strider**: Fast, triangular units that swarm the player.
-- **Chrono Loomer**: Segmented entities that leave a damaging trail.
-- **Void Sentinel**: Heavy, stationary turrets that require heavy damage.
-- **The Negative-Space Void (Boss)**: A massive geometric anomaly housing a singularity.
-
-## 📊 Scoring
-
-- Destroy enemies to increase your score.
-- **Flux Strider**: 100 pts
-- **Chrono Loomer**: 300 pts
-- **Void Sentinel**: 500 pts
-
-## 🛠️ Technical Details
-
-- Built with **Phaser 3** and **Vanilla JavaScript**.
-- Uses **Arcade Physics** for collision and movement.
-- **Procedural Generation**: Textures are generated at runtime using Phaser's Graphics API (No external image assets).
+- **Phaser 3** (Game Engine)

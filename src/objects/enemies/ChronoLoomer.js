@@ -1,3 +1,4 @@
+// Enemy type that moves in a specific pattern and leaves a trail.
 import BaseEnemy from "./BaseEnemy.js";
 import { COLORS } from "../../consts/Colors.js";
 

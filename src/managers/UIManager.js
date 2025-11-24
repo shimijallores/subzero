@@ -1,3 +1,4 @@
+// Manages the heads-up display, score, health, and skill cooldowns.
 import { COLORS } from "../consts/Colors.js";
 
 export default class UIManager {
@@ -14,7 +15,6 @@ export default class UIManager {
     const width = this.scene.scale.width;
     const height = this.scene.scale.height;
 
-    // UI - Top Left
     this.scene.add
       .text(10, 10, `SYSTEM: Z8k // PILOT: ${this.scene.playerName}`, {
         fontFamily: "Courier New, monospace",
@@ -39,7 +39,6 @@ export default class UIManager {
       })
       .setScrollFactor(0);
 
-    // Round UI
     this.roundText = this.scene.add
       .text(width / 2, 80, "ROUND: 1 | TIME: 30", {
         fontFamily: "Courier New, monospace",
@@ -61,7 +60,6 @@ export default class UIManager {
       .setAlpha(0)
       .setDepth(200);
 
-    // UI - Top Right
     this.hpText = this.scene.add
       .text(width - 10, 10, "HP: 100% | LIVES: 3", {
         fontFamily: "Courier New, monospace",
@@ -71,7 +69,6 @@ export default class UIManager {
       .setOrigin(1, 0)
       .setScrollFactor(0);
 
-    // UI - Bottom Right (Skills)
     // Overdrive
     this.scene.add
       .image(width - 26, height - 100, "icon-overdrive")

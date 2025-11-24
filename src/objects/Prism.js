@@ -1,3 +1,4 @@
+// Represents a static obstacle that reflects bullets.
 import { COLORS } from "../consts/Colors.js";
 
 export default class Prism extends Phaser.Physics.Arcade.Sprite {

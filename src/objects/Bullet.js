@@ -1,3 +1,4 @@
+// Represents a projectile fired by the player with specific polarity.
 import { COLORS } from "../consts/Colors.js";
 
 export default class Bullet extends Phaser.Physics.Arcade.Sprite {

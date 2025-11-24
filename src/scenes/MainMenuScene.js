@@ -1,3 +1,4 @@
+// Scene for the main menu, name input, and leaderboard.
 import { COLORS } from "../consts/Colors.js";
 import ScoreManager from "../managers/ScoreManager.js";
 

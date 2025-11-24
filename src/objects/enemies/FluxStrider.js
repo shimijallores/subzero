@@ -1,3 +1,4 @@
+// Fast-moving enemy type that swarms the player.
 import BaseEnemy from "./BaseEnemy.js";
 
 export default class FluxStrider extends BaseEnemy {

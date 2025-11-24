@@ -1,3 +1,4 @@
+// Defines the color palette and constants used throughout the game.
 export const COLORS = {
   BLACK: 0x000000,
   WHITE: 0xffffff,

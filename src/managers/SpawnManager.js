@@ -1,3 +1,4 @@
+// Controls enemy and meteor spawning logic and round progression.
 import Prism from "../objects/Prism.js";
 import FluxStrider from "../objects/enemies/FluxStrider.js";
 import ChronoLoomer from "../objects/enemies/ChronoLoomer.js";
@@ -12,7 +13,7 @@ export default class SpawnManager {
 
     // Round System
     this.currentRound = 1;
-    this.roundTimer = 30000; // 30 seconds
+    this.roundTimer = 30000;
     this.roundDuration = 30000;
     this.enemyCap = 5;
     this.meteorCap = 10;
@@ -44,20 +45,19 @@ export default class SpawnManager {
       this.scene.uiManager.showNextRound(this.currentRound);
     }
 
-    // Heal player slightly? Or maybe just score bonus?
     this.scene.addScore(500 * this.currentRound);
   }
 
   spawn(player, prisms, enemies, meteors, score) {
-    // Keep a minimum number of prisms and enemies around
+    // Keep enemies around
     const playerPos = new Phaser.Math.Vector2(player.x, player.y);
 
-    // Cleanup distant entities
+    // Kill mwhehehe distant entities
     this.cleanup(prisms, playerPos);
     this.cleanup(enemies, playerPos);
     this.cleanup(meteors, playerPos);
 
-    // Spawn new ones if count is low
+    // Spawn new ones
     if (prisms.countActive() < 5) {
       const pos = this.getSpawnPos(playerPos);
       prisms.add(new Prism(this.scene, pos.x, pos.y));

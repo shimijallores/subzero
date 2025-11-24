@@ -1,3 +1,4 @@
+// Main gameplay scene handling the game loop and collisions.
 import { COLORS } from "../consts/Colors.js";
 import Bullet from "../objects/Bullet.js";
 import Prism from "../objects/Prism.js";

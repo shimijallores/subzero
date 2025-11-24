@@ -1,3 +1,4 @@
+// Entry point that initializes the Phaser game instance and config.
 import GameScene from "./scenes/GameScene.js";
 import MainMenuScene from "./scenes/MainMenuScene.js";
 import GameOverScene from "./scenes/GameOverScene.js";

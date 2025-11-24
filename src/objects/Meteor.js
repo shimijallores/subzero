@@ -1,3 +1,4 @@
+// Represents a floating obstacle that damages the player on impact.
 import { COLORS } from "../consts/Colors.js";
 
 export default class Meteor extends Phaser.Physics.Arcade.Sprite {
@@ -26,7 +27,7 @@ export default class Meteor extends Phaser.Physics.Arcade.Sprite {
   }
 
   takeDamage(amount) {
-    this.health -= 10; // Fixed damage for now or passed amount
+    this.health -= 10;
     this.scene.cameras.main.shake(20, 0.005);
 
     // Flash

@@ -1,3 +1,4 @@
+// Handles saving and retrieving high scores from local storage.
 export default class ScoreManager {
   constructor() {
     this.storageKey = "subzero_leaderboard";

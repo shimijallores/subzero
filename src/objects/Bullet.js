@@ -12,10 +12,10 @@ export default class Bullet extends Phaser.Physics.Arcade.Sprite {
     this.lifespan = 2000; // ms
   }
 
-  fire(x, y, angle, canReflect = true) {
+  fire(x, y, angle, canReflect = true, polarity = COLORS.WHITE) {
     this.enableBody(true, x, y, true, true);
-    this.setTint(COLORS.WHITE);
-    this.polarity = COLORS.WHITE;
+    this.setTint(polarity);
+    this.polarity = polarity;
     this.canReflect = canReflect;
 
     // Rotate bullet to face direction

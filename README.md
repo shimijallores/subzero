@@ -6,7 +6,8 @@ A high-speed, vector-based space shooter set in a collapsing singularity.
 
 - **Movement**: `WASD` or `Arrow Keys` (Physics-based drift system)
 - **Aim**: Mouse Cursor
-- **Fire**: `Left Mouse Button` (Auto-fire enabled)
+- **Fire White**: `Left Mouse Button`
+- **Fire Cyan**: `Right Mouse Button`
 
 ## ⚔️ Mechanics
 
@@ -14,9 +15,9 @@ A high-speed, vector-based space shooter set in a collapsing singularity.
 
 The core combat mechanic revolves around **Polarity Matching**.
 
-- **White Bullets**: Default fire. Effective against **White** enemies.
-- **Cyan (Accent) Bullets**: Created by shooting through **Prisms**. Effective against **Cyan** enemies.
-- **Enemies**: Most enemies will phase-shift between White and Cyan polarities. You must time your shots or use Prisms to match their current state.
+- **White Bullets**: Effective against **White** enemies.
+- **Cyan (Accent) Bullets**: Effective against **Cyan** enemies.
+- **Enemies**: Most enemies will phase-shift between White and Cyan polarities. You must switch your fire mode to match their current state.
 
 ### The Void
 

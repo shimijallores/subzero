@@ -18,6 +18,9 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create() {
+    // Disable context menu for right-click shooting
+    this.input.mouse.disableContextMenu();
+
     // Generate Textures
     this.createTextures();
 
@@ -251,7 +254,7 @@ export default class GameScene extends Phaser.Scene {
     bossGfx.generateTexture("negative-space-void", 128, 128);
   }
 
-  fireBullet(pointer) {
+  fireBullet(pointer, polarity = COLORS.WHITE) {
     const bullet = this.bullets.get();
     if (bullet) {
       const angle = Phaser.Math.Angle.Between(
@@ -260,7 +263,7 @@ export default class GameScene extends Phaser.Scene {
         pointer.worldX,
         pointer.worldY
       );
-      bullet.fire(this.player.x, this.player.y, angle);
+      bullet.fire(this.player.x, this.player.y, angle, true, polarity);
       this.sound.play("laser", {
         volume: 0.3,
         detune: Math.random() * 200 - 100,
@@ -347,7 +350,14 @@ export default class GameScene extends Phaser.Scene {
     // Auto-Fire Logic
     if (this.input.activePointer.isDown) {
       if (time > this.lastFired) {
-        this.fireBullet(this.input.activePointer);
+        const pointer = this.input.activePointer;
+        let polarity = COLORS.WHITE;
+
+        if (pointer.rightButtonDown()) {
+          polarity = COLORS.ACCENT;
+        }
+
+        this.fireBullet(pointer, polarity);
         this.lastFired = time + this.fireRate;
       }
     }

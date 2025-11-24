@@ -1,7 +1,7 @@
 import GameScene from "./scenes/GameScene.js";
 
 const config = {
-  type: Phaser.WEBGL, // WebGL is required for shaders
+  type: Phaser.WEBGL,
   width: 800,
   height: 600,
   backgroundColor: "#000000",

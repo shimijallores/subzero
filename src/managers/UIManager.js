@@ -88,6 +88,23 @@ export default class UIManager {
       })
       .setOrigin(1, 0.5)
       .setScrollFactor(0);
+
+    // Damage Vignette
+    this.vignette = this.scene.add
+      .image(width / 2, height / 2, "vignette")
+      .setScrollFactor(0)
+      .setAlpha(0)
+      .setDepth(100);
+  }
+
+  triggerDamageVignette() {
+    this.vignette.setAlpha(1);
+    this.scene.tweens.add({
+      targets: this.vignette,
+      alpha: 0,
+      duration: 500,
+      ease: "Power2",
+    });
   }
 
   updateScore(score) {

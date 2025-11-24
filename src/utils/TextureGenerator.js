@@ -113,5 +113,24 @@ export default class TextureGenerator {
     dashIcon.fillStyle(COLORS.WHITE, 0.5);
     dashIcon.fillTriangle(16, 4, 28, 28, 4, 28);
     dashIcon.generateTexture("icon-dash", 32, 32);
+
+    // Vignette Texture (Red Gradient)
+    const width = this.scene.scale.width;
+    const height = this.scene.scale.height;
+    const texture = this.scene.textures.createCanvas("vignette", width, height);
+    const ctx = texture.getContext();
+    const grd = ctx.createRadialGradient(
+      width / 2,
+      height / 2,
+      width * 0.3,
+      width / 2,
+      height / 2,
+      width * 2
+    );
+    grd.addColorStop(0, "rgba(255, 0, 0, 0)");
+    grd.addColorStop(1, "rgba(255, 0, 0, 0.6)");
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, 0, width, height);
+    texture.refresh();
   }
 }

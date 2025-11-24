@@ -323,6 +323,7 @@ export default class Player extends Phaser.GameObjects.Triangle {
     this.health -= amount;
     this.scene.cameras.main.shake(100, 0.02);
     this.scene.sound.play("damage", { volume: 0.6 });
+    this.scene.uiManager.triggerDamageVignette();
 
     if (this.health <= 0) {
       this.lives--;

@@ -16,7 +16,7 @@ export default class UIManager {
 
     // UI - Top Left
     this.scene.add
-      .text(10, 10, "SYSTEM: ZERO-K // EPOCH ECHO", {
+      .text(10, 10, `SYSTEM: Z8k // PILOT: ${this.scene.playerName}`, {
         fontFamily: "Courier New, monospace",
         fontSize: "16px",
         color: COLORS.WHITE_STRING,
@@ -41,7 +41,7 @@ export default class UIManager {
 
     // Round UI
     this.roundText = this.scene.add
-      .text(width / 2, 30, "ROUND: 1 | TIME: 30", {
+      .text(width / 2, 80, "ROUND: 1 | TIME: 30", {
         fontFamily: "Courier New, monospace",
         fontSize: "20px",
         color: COLORS.ACCENT_STRING,

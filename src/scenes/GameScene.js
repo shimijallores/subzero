@@ -13,6 +13,10 @@ export default class GameScene extends Phaser.Scene {
     super("GameScene");
   }
 
+  init(data) {
+    this.playerName = data.playerName || "PILOT";
+  }
+
   preload() {
     this.load.audio("laser", "assets/sounds/laser.mp3");
     this.load.audio("damage", "assets/sounds/damage.mp3");
@@ -158,7 +162,7 @@ export default class GameScene extends Phaser.Scene {
 
     if (this.player.lives <= 0) {
       this.music.stop();
-      this.scene.restart();
+      this.scene.start("GameOverScene");
     }
   }
 

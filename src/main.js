@@ -1,4 +1,6 @@
 import GameScene from "./scenes/GameScene.js";
+import MainMenuScene from "./scenes/MainMenuScene.js";
+import GameOverScene from "./scenes/GameOverScene.js";
 
 const config = {
   type: Phaser.WEBGL,
@@ -6,7 +8,10 @@ const config = {
   height: 600,
   backgroundColor: "#000000",
   parent: "game-container",
-  scene: [GameScene],
+  dom: {
+    createContainer: true,
+  },
+  scene: [MainMenuScene, GameScene, GameOverScene],
   physics: {
     default: "arcade",
     arcade: {

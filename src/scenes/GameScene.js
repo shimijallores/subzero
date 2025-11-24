@@ -1,7 +1,9 @@
 import { COLORS } from "../consts/Colors.js";
 import Bullet from "../objects/Bullet.js";
 import Prism from "../objects/Prism.js";
-import Enemy from "../objects/Enemy.js";
+import FluxStrider from "../objects/enemies/FluxStrider.js";
+import ChronoLoomer from "../objects/enemies/ChronoLoomer.js";
+import VoidSentinel from "../objects/enemies/VoidSentinel.js";
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -27,8 +29,7 @@ export default class GameScene extends Phaser.Scene {
     });
 
     this.enemies = this.physics.add.group({
-      classType: Enemy,
-      immovable: true,
+      runChildUpdate: true,
     });
 
     // Player Ship - Solid White Triangle
@@ -81,8 +82,8 @@ export default class GameScene extends Phaser.Scene {
     this.prisms.add(new Prism(this, 200, 200));
     this.prisms.add(new Prism(this, 600, 400));
 
-    this.enemies.add(new Enemy(this, 400, 100));
-    this.enemies.add(new Enemy(this, 100, 500));
+    // Initial Spawns
+    this.spawnEntities();
 
     // Collisions
     this.physics.add.collider(this.bullets, this.prisms, (bullet, prism) => {
@@ -145,6 +146,28 @@ export default class GameScene extends Phaser.Scene {
     particleGfx.fillStyle(COLORS.WHITE);
     particleGfx.fillRect(0, 0, 4, 4);
     particleGfx.generateTexture("particle", 4, 4);
+
+    // Flux Strider Texture (Triangle Cluster)
+    const fluxGfx = this.make.graphics({ x: 0, y: 0, add: false });
+    fluxGfx.lineStyle(2, 0xffffff);
+    fluxGfx.strokeTriangle(0, 20, 10, 0, 20, 20);
+    fluxGfx.strokeTriangle(10, 20, 20, 0, 30, 20);
+    fluxGfx.generateTexture("flux-strider", 32, 32);
+
+    // Chrono Loomer Texture (Segmented)
+    const chronoGfx = this.make.graphics({ x: 0, y: 0, add: false });
+    chronoGfx.lineStyle(2, 0xffffff);
+    chronoGfx.strokeCircle(16, 16, 14);
+    chronoGfx.strokeRect(10, 10, 12, 12);
+    chronoGfx.generateTexture("chrono-loomer", 32, 32);
+
+    // Void Sentinel Texture (Large Hollow)
+    const voidGfx = this.make.graphics({ x: 0, y: 0, add: false });
+    voidGfx.lineStyle(4, 0xffffff);
+    voidGfx.strokeRect(0, 0, 64, 64);
+    voidGfx.lineStyle(2, 0xffffff);
+    voidGfx.strokeRect(16, 16, 32, 32);
+    voidGfx.generateTexture("void-sentinel", 64, 64);
   }
 
   fireBullet(pointer) {
@@ -197,9 +220,16 @@ export default class GameScene extends Phaser.Scene {
       this.prisms.add(new Prism(this, pos.x, pos.y));
     }
 
-    if (this.enemies.countActive() < 3) {
+    if (this.enemies.countActive() < 5) {
       const pos = this.getSpawnPos(playerPos);
-      this.enemies.add(new Enemy(this, pos.x, pos.y));
+      const rand = Math.random();
+      if (rand < 0.6) {
+        this.enemies.add(new FluxStrider(this, pos.x, pos.y));
+      } else if (rand < 0.9) {
+        this.enemies.add(new ChronoLoomer(this, pos.x, pos.y));
+      } else {
+        this.enemies.add(new VoidSentinel(this, pos.x, pos.y));
+      }
     }
   }
 

@@ -31,13 +31,33 @@ export default class BackgroundManager {
     starFieldGfx2.generateTexture("starfield2", 512, 512);
 
     // Add TileSprites fixed to camera
-    this.bgLayer1 = this.scene.add.tileSprite(400, 300, 800, 600, "starfield1");
+    const width = this.scene.scale.width;
+    const height = this.scene.scale.height;
+
+    this.bgLayer1 = this.scene.add.tileSprite(width / 2, height / 2, width, height, "starfield1");
     this.bgLayer1.setScrollFactor(0);
     this.bgLayer1.setDepth(-10);
 
-    this.bgLayer2 = this.scene.add.tileSprite(400, 300, 800, 600, "starfield2");
+    this.bgLayer2 = this.scene.add.tileSprite(width / 2, height / 2, width, height, "starfield2");
     this.bgLayer2.setScrollFactor(0);
     this.bgLayer2.setDepth(-9);
+
+    // Handle Resize
+    this.scene.scale.on('resize', this.resize, this);
+  }
+
+  resize(gameSize) {
+    const width = gameSize.width;
+    const height = gameSize.height;
+
+    if (this.bgLayer1) {
+        this.bgLayer1.setPosition(width / 2, height / 2);
+        this.bgLayer1.setSize(width, height);
+    }
+    if (this.bgLayer2) {
+        this.bgLayer2.setPosition(width / 2, height / 2);
+        this.bgLayer2.setSize(width, height);
+    }
   }
 
   update() {

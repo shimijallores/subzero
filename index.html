@@ -13,7 +13,38 @@
   </head>
   <body>
     <div id="game-container"></div>
+    <div id="ui-layer">
+      <div class="hud-panel left-panel">
+        <div id="system-info">SYSTEM: Z8k // PILOT: PILOT</div>
+        <div id="status-info">STATUS: UNSTABLE</div>
+        <div id="score-info">SCORE: 0</div>
+      </div>
+
+      <div class="hud-panel center-panel">
+        <div id="round-info">ROUND: 1 | TIME: 30</div>
+        <div id="round-announce">ROUND 2</div>
+      </div>
+
+      <div class="hud-panel right-panel">
+        <div id="hp-info">HP: 100% | LIVES: 3</div>
+        <div class="skill-container">
+          <div class="skill-row">
+            <div id="overdrive-text" class="skill-text">READY [TAB]</div>
+            <div class="skill-icon overdrive"></div>
+          </div>
+          <div class="skill-row">
+            <div id="shield-text" class="skill-text">READY [Q]</div>
+            <div class="skill-icon shield"></div>
+          </div>
+          <div class="skill-row">
+            <div id="dash-text" class="skill-text">READY [E]</div>
+            <div class="skill-icon dash"></div>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="scanlines"></div>
+    <div id="damage-vignette"></div>
     <script type="module" src="src/main.js"></script>
   </body>
 </html>

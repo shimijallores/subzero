@@ -4,178 +4,129 @@ import { COLORS } from "../consts/Colors.js";
 export default class UIManager {
   constructor(scene) {
     this.scene = scene;
-    this.scoreText = null;
-    this.hpText = null;
+    
+    // DOM Elements
+    this.systemInfo = null;
+    this.scoreInfo = null;
+    this.roundInfo = null;
+    this.roundAnnounce = null;
+    this.hpInfo = null;
+    
     this.overdriveText = null;
     this.shieldText = null;
     this.dashText = null;
+    
+    this.damageVignette = null;
   }
 
   create() {
-    const width = this.scene.scale.width;
-    const height = this.scene.scale.height;
+    // Get DOM elements
+    this.systemInfo = document.getElementById("system-info");
+    this.scoreInfo = document.getElementById("score-info");
+    this.roundInfo = document.getElementById("round-info");
+    this.roundAnnounce = document.getElementById("round-announce");
+    this.hpInfo = document.getElementById("hp-info");
+    
+    this.overdriveText = document.getElementById("overdrive-text");
+    this.shieldText = document.getElementById("shield-text");
+    this.dashText = document.getElementById("dash-text");
+    
+    this.damageVignette = document.getElementById("damage-vignette");
 
-    this.scene.add
-      .text(10, 10, `SYSTEM: Z8k // PILOT: ${this.scene.playerName}`, {
-        fontFamily: "Courier New, monospace",
-        fontSize: "16px",
-        color: COLORS.WHITE_STRING,
-      })
-      .setScrollFactor(0);
+    // Show UI Layer
+    const uiLayer = document.getElementById("ui-layer");
+    if (uiLayer) {
+        uiLayer.style.display = "flex";
+    }
 
-    this.scene.add
-      .text(10, 30, "STATUS: UNSTABLE", {
-        fontFamily: "Courier New, monospace",
-        fontSize: "16px",
-        color: COLORS.ACCENT_STRING,
-      })
-      .setScrollFactor(0);
-
-    this.scoreText = this.scene.add
-      .text(10, 50, "SCORE: 0", {
-        fontFamily: "Courier New, monospace",
-        fontSize: "16px",
-        color: COLORS.WHITE_STRING,
-      })
-      .setScrollFactor(0);
-
-    this.roundText = this.scene.add
-      .text(width / 2, 80, "ROUND: 1 | TIME: 30", {
-        fontFamily: "Courier New, monospace",
-        fontSize: "20px",
-        color: COLORS.ACCENT_STRING,
-      })
-      .setOrigin(0.5)
-      .setScrollFactor(0);
-
-    this.nextRoundText = this.scene.add
-      .text(width / 2, height / 2, "ROUND 2", {
-        fontFamily: "Courier New, monospace",
-        fontSize: "64px",
-        color: COLORS.WHITE_STRING,
-        fontStyle: "bold",
-      })
-      .setOrigin(0.5)
-      .setScrollFactor(0)
-      .setAlpha(0)
-      .setDepth(200);
-
-    this.hpText = this.scene.add
-      .text(width - 10, 10, "HP: 100% | LIVES: 3", {
-        fontFamily: "Courier New, monospace",
-        fontSize: "16px",
-        color: COLORS.WHITE_STRING,
-      })
-      .setOrigin(1, 0)
-      .setScrollFactor(0);
-
-    // Overdrive
-    this.scene.add
-      .image(width - 26, height - 100, "icon-overdrive")
-      .setScrollFactor(0);
-    this.overdriveText = this.scene.add
-      .text(width - 50, height - 100, "READY [TAB]", {
-        fontFamily: "Courier New, monospace",
-        fontSize: "16px",
-        color: COLORS.ACCENT_STRING,
-      })
-      .setOrigin(1, 0.5)
-      .setScrollFactor(0);
-
-    // Shield
-    this.scene.add
-      .image(width - 26, height - 60, "icon-shield")
-      .setScrollFactor(0);
-    this.shieldText = this.scene.add
-      .text(width - 50, height - 60, "READY [Q]", {
-        fontFamily: "Courier New, monospace",
-        fontSize: "16px",
-        color: COLORS.ACCENT_STRING,
-      })
-      .setOrigin(1, 0.5)
-      .setScrollFactor(0);
-
-    // Dash
-    this.scene.add
-      .image(width - 26, height - 20, "icon-dash")
-      .setScrollFactor(0);
-    this.dashText = this.scene.add
-      .text(width - 50, height - 20, "READY [E]", {
-        fontFamily: "Courier New, monospace",
-        fontSize: "16px",
-        color: COLORS.ACCENT_STRING,
-      })
-      .setOrigin(1, 0.5)
-      .setScrollFactor(0);
-
-    // Damage Vignette
-    this.vignette = this.scene.add
-      .image(width / 2, height / 2, "vignette")
-      .setScrollFactor(0)
-      .setAlpha(0)
-      .setDepth(100);
+    // Initialize static text
+    if (this.systemInfo) {
+        this.systemInfo.innerText = `SYSTEM: Z8k // PILOT: ${this.scene.playerName || "PILOT"}`;
+    }
   }
 
   triggerDamageVignette() {
-    this.vignette.setAlpha(1);
-    this.scene.tweens.add({
-      targets: this.vignette,
-      alpha: 0,
-      duration: 500,
-      ease: "Power2",
-    });
+    if (!this.damageVignette) return;
+    
+    this.damageVignette.style.opacity = "1";
+    
+    setTimeout(() => {
+        this.damageVignette.style.opacity = "0";
+    }, 100);
   }
 
   updateScore(score) {
-    this.scoreText.setText(`SCORE: ${score}`);
+    if (this.scoreInfo) this.scoreInfo.innerText = `SCORE: ${score}`;
   }
 
   updateHP(health, lives) {
-    this.hpText.setText(`HP: ${health}% | LIVES: ${lives}`);
+    if (this.hpInfo) this.hpInfo.innerText = `HP: ${health}% | LIVES: ${lives}`;
   }
 
   setHPColor(color) {
-    this.hpText.setColor(color);
+    if (this.hpInfo) {
+        if (typeof color === 'number') {
+            color = '#' + color.toString(16).padStart(6, '0');
+        }
+        this.hpInfo.style.color = color;
+        this.hpInfo.style.borderColor = color;
+    }
   }
 
   updateOverdriveStatus(text, color) {
-    this.overdriveText.setText(text);
-    if (color) this.overdriveText.setColor(color);
+    if (this.overdriveText) {
+        this.overdriveText.innerText = text;
+        if (color) {
+             if (typeof color === 'number') color = '#' + color.toString(16).padStart(6, '0');
+            this.overdriveText.style.color = color;
+        }
+    }
   }
 
   updateShieldStatus(text, color) {
-    this.shieldText.setText(text);
-    if (color) this.shieldText.setColor(color);
+    if (this.shieldText) {
+        this.shieldText.innerText = text;
+        if (color) {
+             if (typeof color === 'number') color = '#' + color.toString(16).padStart(6, '0');
+            this.shieldText.style.color = color;
+        }
+    }
   }
 
   updateDashStatus(text, color) {
-    this.dashText.setText(text);
-    if (color) this.dashText.setColor(color);
+    if (this.dashText) {
+        this.dashText.innerText = text;
+        if (color) {
+             if (typeof color === 'number') color = '#' + color.toString(16).padStart(6, '0');
+            this.dashText.style.color = color;
+        }
+    }
   }
 
   updateRound(round, timeRemaining) {
-    const seconds = Math.ceil(timeRemaining / 1000);
-    this.roundText.setText(`ROUND: ${round} | TIME: ${seconds}`);
+    if (this.roundInfo) {
+        const seconds = Math.ceil(timeRemaining / 1000);
+        this.roundInfo.innerText = `ROUND: ${round} | TIME: ${seconds}`;
+    }
   }
 
   showNextRound(round) {
-    this.nextRoundText.setText(`ROUND ${round}`);
-    this.nextRoundText.setAlpha(1);
-    this.nextRoundText.setScale(0.5);
+    if (this.roundAnnounce) {
+        this.roundAnnounce.innerText = `ROUND ${round}`;
+        this.roundAnnounce.style.opacity = "1";
+        this.roundAnnounce.style.transform = "translate(-50%, -50%) scale(1.2)";
+        
+        setTimeout(() => {
+            this.roundAnnounce.style.opacity = "0";
+            this.roundAnnounce.style.transform = "translate(-50%, -50%) scale(1)";
+        }, 2000);
+    }
+  }
 
-    this.scene.tweens.add({
-      targets: this.nextRoundText,
-      scale: 1.2,
-      duration: 500,
-      ease: "Back.out",
-      onComplete: () => {
-        this.scene.tweens.add({
-          targets: this.nextRoundText,
-          alpha: 0,
-          delay: 1000,
-          duration: 500,
-        });
-      },
-    });
+  hide() {
+    const uiLayer = document.getElementById("ui-layer");
+    if (uiLayer) {
+        uiLayer.style.display = "none";
+    }
   }
 }

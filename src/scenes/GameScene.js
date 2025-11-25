@@ -68,7 +68,9 @@ export default class GameScene extends Phaser.Scene {
     });
 
     // Player
-    this.player = new Player(this, 400, 300, this.bullets);
+    const centerX = this.scale.width / 2;
+    const centerY = this.scale.height / 2;
+    this.player = new Player(this, centerX, centerY, this.bullets);
 
     // Camera
     this.cameras.main.startFollow(this.player);
@@ -170,6 +172,7 @@ export default class GameScene extends Phaser.Scene {
 
     if (this.player.lives <= 0) {
       this.music.stop();
+      this.uiManager.hide();
       this.scene.start("GameOverScene", {
         score: this.score,
         playerName: this.playerName,

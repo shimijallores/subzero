@@ -5,9 +5,11 @@ import GameOverScene from "./scenes/GameOverScene.js";
 
 const config = {
   type: Phaser.WEBGL,
-  width: 800,
-  height: 600,
   backgroundColor: "#000000",
+  scale: {
+    mode: Phaser.Scale.RESIZE,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+  },
   parent: "game-container",
   dom: {
     createContainer: true,

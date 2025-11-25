@@ -10,7 +10,7 @@ export default class Bullet extends Phaser.Physics.Arcade.Sprite {
     this.polarity = COLORS.WHITE;
     this.canReflect = true;
     this.born = 0;
-    this.lifespan = 2000; // ms
+    this.lifespan = 2000;
   }
 
   fire(x, y, angle, canReflect = true, polarity = COLORS.WHITE) {

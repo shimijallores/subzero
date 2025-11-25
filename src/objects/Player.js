@@ -330,9 +330,6 @@ export default class Player extends Phaser.GameObjects.Triangle {
       this.lives--;
       if (this.lives > 0) {
         this.health = 100;
-        // Optional: Add temporary invulnerability
-      } else {
-        // Game Over logic handled by scene usually, but we can emit or just let scene check lives
       }
     }
     return true;

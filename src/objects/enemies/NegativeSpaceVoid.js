@@ -19,7 +19,7 @@ export default class NegativeSpaceVoid extends BaseEnemy {
 
     // Attack Timer
     this.attackTimer = 0;
-    this.attackInterval = 3000; // Every 3 seconds
+    this.attackInterval = 3000;
   }
 
   update(time, delta) {
@@ -40,19 +40,18 @@ export default class NegativeSpaceVoid extends BaseEnemy {
     const step = (Math.PI * 2) / bulletCount;
 
     for (let i = 0; i < bulletCount; i++) {
-      const angle = i * step + this.rotation; // Add rotation to spiral it slightly
+      const angle = i * step + this.rotation;
 
       // We need to access the bullet group from the scene
-      // Assuming the scene has 'this.bullets'
       const bullet = this.scene.bullets.get();
       if (bullet) {
         // Offset spawn to be outside the boss
         const spawnX = this.x + Math.cos(angle) * 70;
         const spawnY = this.y + Math.sin(angle) * 70;
 
-        bullet.fire(spawnX, spawnY, angle, false); // false = cannot reflect
-        bullet.lifespan = 4000; // Longer lifespan for boss bullets
-        bullet.speed = 200; // Slower speed as per design
+        bullet.fire(spawnX, spawnY, angle, false);
+        bullet.lifespan = 4000;
+        bullet.speed = 200;
 
         this.scene.physics.velocityFromRotation(
           angle,
@@ -61,9 +60,6 @@ export default class NegativeSpaceVoid extends BaseEnemy {
         );
       }
     }
-
-    // Sound effect if available
-    // this.scene.sound.play('boss-attack');
   }
 
   takeDamage(bulletPolarity) {
@@ -84,7 +80,7 @@ export default class NegativeSpaceVoid extends BaseEnemy {
       }
       return false; // Not killed yet
     } else {
-      // Deflect/Resist
+      // Deflect
       return super.takeDamage(bulletPolarity);
     }
   }

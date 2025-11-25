@@ -111,11 +111,11 @@ export default class GameScene extends Phaser.Scene {
       // Overdrive Logic
       if (bullet.isOverdrive) {
         this.addScore(enemy.scoreValue || 100);
-        this.sound.play("enemy-hit", { volume: 0.5, rate: 1.5 }); // Higher pitch
+        this.sound.play("enemy-hit", { volume: 0.5, rate: 1.5 });
 
         // Boss handling
         if (enemy.health) {
-          enemy.health -= 50; // Massive damage
+          enemy.health -= 50;
           enemy.setTint(COLORS.RED);
           if (enemy.health <= 0) enemy.destroy();
         } else {
@@ -131,7 +131,7 @@ export default class GameScene extends Phaser.Scene {
         this.addScore(enemy.scoreValue || 100);
         this.sound.play("enemy-hit", { volume: 0.5 });
       }
-      bullet.disableBody(true, true); // Destroy bullet
+      bullet.disableBody(true, true);
     });
 
     // Player vs Enemies Collision
@@ -181,7 +181,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   updateSkillUI(time) {
-    // Overdrive
+    // Overdri
     if (this.player.overdrive.active) {
       this.uiManager.updateOverdriveStatus("ACTIVE", COLORS.RED_STRING);
     } else if (!this.player.overdrive.ready) {

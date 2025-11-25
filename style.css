@@ -40,6 +40,8 @@ body {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  transition: transform 0.1s ease-out;
+  will-change: transform;
 }
 
 .left-panel {
@@ -57,19 +59,32 @@ body {
 
 .center-panel {
   position: absolute;
-  top: 20px;
+  top: 100px;
   left: 50%;
   transform: translateX(-50%);
   align-items: center;
+  transition: transform 0.1s ease-out;
+  will-change: transform;
 }
 
-#system-info, #score-info, #hp-info {
+#system-info,
+#score-info,
+#hp-info {
   color: #fff;
   font-size: 18px;
   font-weight: bold;
   background: rgba(0, 0, 0, 0.5);
   padding: 5px 10px;
   border-left: 4px solid #fff;
+  transition: all 0.3s ease;
+}
+
+#system-info:hover,
+#score-info:hover,
+#hp-info:hover {
+  background: rgba(0, 0, 0, 0.8);
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+  transform: translateX(5px);
 }
 
 #status-info {
@@ -78,11 +93,18 @@ body {
   background: rgba(0, 0, 0, 0.5);
   padding: 5px 10px;
   border-left: 4px solid #0ff;
+  transition: all 0.3s ease;
+}
+
+#status-info:hover {
+  background: rgba(0, 0, 0, 0.8);
+  text-shadow: 0 0 10px #0ff;
+  transform: translateX(5px);
 }
 
 #round-info {
   color: #0ff;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: bold;
   text-shadow: 0 0 10px #0ff;
 }
@@ -92,7 +114,8 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 80px;
+  font-size: 64px;
+  text-wrap: nowrap;
   color: #fff;
   font-weight: bold;
   opacity: 0;
@@ -111,11 +134,26 @@ body {
   align-items: center;
   justify-content: flex-end;
   gap: 10px;
+  transition: all 0.3s ease;
+}
+
+.skill-row:hover {
+  transform: translateX(-5px) scale(1.05);
+}
+
+.skill-row:hover .skill-icon {
+  box-shadow: 0 0 15px currentColor;
+  filter: brightness(1.3);
 }
 
 .skill-text {
   color: #0ff;
   font-size: 16px;
+  transition: text-shadow 0.3s ease;
+}
+
+.skill-row:hover .skill-text {
+  text-shadow: 0 0 10px #0ff;
 }
 
 .skill-icon {
@@ -156,7 +194,11 @@ body {
   height: 100%;
   pointer-events: none;
   z-index: 5;
-  background: radial-gradient(circle, transparent 50%, rgba(255, 0, 0, 0.6) 100%);
+  background: radial-gradient(
+    circle,
+    transparent 50%,
+    rgba(255, 0, 0, 0.6) 100%
+  );
   opacity: 0;
   transition: opacity 0.2s;
 }

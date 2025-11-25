@@ -44,8 +44,8 @@ export default class MainMenuScene extends Phaser.Scene {
     // Title
     const title = this.add
       .text(width / 2, height / 3 - 50, "SUBZERO", {
-        fontFamily: "Courier New, monospace",
-        fontSize: "124px",
+        fontFamily: "'Space Nova', 'Courier New', monospace",
+        fontSize: "164px",
         color: COLORS.ACCENT_STRING,
         fontStyle: "bold",
       })

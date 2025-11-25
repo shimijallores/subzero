@@ -74,6 +74,7 @@ export default class GameScene extends Phaser.Scene {
 
     // Camera
     this.cameras.main.startFollow(this.player);
+    this.cameras.main.zoom = 1.5;
 
     // UI
     this.uiManager = new UIManager(this);

@@ -78,7 +78,6 @@ export default class UIManager {
   }
 
   startParallaxLoop() {
-    // Use requestAnimationFrame for smooth animation
     const animate = () => {
       this.updateParallax();
       this.animationFrame = requestAnimationFrame(animate);

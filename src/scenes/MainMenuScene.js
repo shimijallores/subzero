@@ -227,18 +227,26 @@ export default class MainMenuScene extends Phaser.Scene {
       CONTROLS:
       [W,A,S,D] or [ARROWS] - Thrusters
       [MOUSE] - Aim
-      [L-CLICK] - Fire Polarity A (White)
-      [R-CLICK] - Fire Polarity B (Cyan)
+      [LEFT CLICK] - Fire White Bullets
+      [RIGHT CLICK] - Fire Cyan Bullets
       
       SKILLS:
-      [TAB] - Overdrive (Rapid Fire)
-      [Q] - Shield (Deflect)
-      [E] - Dash (Evasive Maneuver)
+      [TAB] - Overdrive (Rapid Fire - 7s)
+      [Q] - Shield (Deflect Projectiles - 5s)
+      [E] - Dash (Invincible Burst - 3s CD)
+      
+      POLARITY MECHANIC:
+      Enemies have a color (White or Cyan).
+      Match your bullet color to the enemy color!
+      Wrong color = No damage.
+      
+      UPGRADES:
+      Every 3 rounds, choose from powerful upgrades.
+      Collect Prisms for bonus points.
       
       OBJECTIVE:
-      Survive the void. 
-      Match bullet polarity to enemies to destroy them.
-      Avoid meteors and enemy fire.
+      Survive infinite waves of increasing difficulty.
+      Climb the leaderboard!
       `;
 
     const text = this.add

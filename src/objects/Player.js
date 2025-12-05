@@ -23,6 +23,18 @@ export default class Player extends Phaser.GameObjects.Triangle {
     this.lastFired = 0;
     this.fireRate = 200;
 
+    // Upgrades tracking
+    this.upgrades = {
+      splitCannon: 0,
+      growingBullets: 0,
+      flameShield: 0,
+      healthRecovery: 0,
+      fireRateBonus: 0,
+    };
+
+    // Base fire rate for upgrade calculations
+    this.baseFireRate = 200;
+
     // Input
     this.cursors = scene.input.keyboard.createCursorKeys();
     this.wasd = scene.input.keyboard.addKeys({
@@ -32,9 +44,7 @@ export default class Player extends Phaser.GameObjects.Triangle {
       right: Phaser.Input.Keyboard.KeyCodes.D,
       space: Phaser.Input.Keyboard.KeyCodes.SPACE,
     });
-    this.tabKey = scene.input.keyboard.addKey(
-      Phaser.Input.Keyboard.KeyCodes.TAB
-    );
+    this.fKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F);
     this.qKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
     this.eKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
@@ -175,37 +185,60 @@ export default class Player extends Phaser.GameObjects.Triangle {
   }
 
   fireBullet(pointer, polarity) {
-    const bullet = this.bullets.get();
-    if (bullet) {
-      const angle = Phaser.Math.Angle.Between(
-        this.x,
-        this.y,
-        pointer.worldX,
-        pointer.worldY
-      );
+    const baseAngle = Phaser.Math.Angle.Between(
+      this.x,
+      this.y,
+      pointer.worldX,
+      pointer.worldY
+    );
 
-      if (this.overdrive.active) {
-        bullet.fire(this.x, this.y, angle, false, COLORS.RED);
-        bullet.isOverdrive = true;
-        this.scene.sound.play("laser", {
-          volume: 0.4,
-          detune: 1200,
-          rate: 2,
-        });
-      } else {
-        bullet.fire(this.x, this.y, angle, true, polarity);
-        bullet.isOverdrive = false;
-        this.scene.sound.play("laser", {
-          volume: 0.3,
-          detune: Math.random() * 200 - 100,
-        });
+    // Calculate bullet count and spread based on split cannon level
+    const splitLevel = this.upgrades.splitCannon;
+    const bulletCount = 1 + splitLevel * 2; // 1, 3, 5, 7 bullets
+    const spreadAngle = splitLevel > 0 ? Math.PI / 8 : 0; // 22.5 degree spread
+
+    for (let i = 0; i < bulletCount; i++) {
+      const bullet = this.bullets.get();
+      if (bullet) {
+        // Calculate angle offset for spread
+        let angle = baseAngle;
+        if (bulletCount > 1) {
+          const offset =
+            (i - (bulletCount - 1) / 2) *
+            ((spreadAngle / (bulletCount - 1)) * 2);
+          angle = baseAngle + offset;
+        }
+
+        if (this.overdrive.active) {
+          bullet.fire(this.x, this.y, angle, false, COLORS.RED);
+          bullet.isOverdrive = true;
+          bullet.growthLevel = this.upgrades.growingBullets;
+        } else {
+          bullet.fire(this.x, this.y, angle, true, polarity);
+          bullet.isOverdrive = false;
+          bullet.growthLevel = this.upgrades.growingBullets;
+        }
       }
+    }
+
+    // Play sound once
+    if (this.overdrive.active) {
+      this.scene.sound.play("laser", {
+        volume: 0.4,
+        detune: 1200,
+        rate: 2,
+      });
+    } else {
+      this.scene.sound.play("laser", {
+        volume: 0.3,
+        detune: Math.random() * 200 - 100,
+      });
     }
   }
 
   handleSkills(time) {
     // Overdrive
-    if (Phaser.Input.Keyboard.JustDown(this.tabKey)) {
+    if (Phaser.Input.Keyboard.JustDown(this.fKey)) {
       if (this.overdrive.ready) {
         this.overdrive.active = true;
         this.overdrive.ready = false;
@@ -220,7 +253,11 @@ export default class Player extends Phaser.GameObjects.Triangle {
       if (time > this.overdrive.timer) {
         this.overdrive.active = false;
         this.overdrive.cooldownTimer = time + this.overdrive.cooldown;
-        this.fireRate = 200;
+        // Restore fire rate with upgrade bonus applied
+        this.fireRate = Math.max(
+          50,
+          this.baseFireRate * (1 - this.upgrades.fireRateBonus)
+        );
         this.scene.cameras.main.setBackgroundColor(COLORS.BLACK);
       }
     } else if (!this.overdrive.ready) {
@@ -247,10 +284,26 @@ export default class Player extends Phaser.GameObjects.Triangle {
     if (this.shield.active) {
       this.shieldGfx.setPosition(this.x, this.y);
       this.shieldGfx.rotation += 0.1;
+
+      // Update shield visual for flame shield
+      if (this.upgrades.flameShield > 0) {
+        this.shieldGfx.clear();
+        this.shieldGfx.lineStyle(4 + this.upgrades.flameShield * 2, COLORS.RED);
+        this.shieldGfx.strokeCircle(0, 0, 30 + this.upgrades.flameShield * 10);
+        // Add pulsing flame effect
+        const pulseScale = 1 + Math.sin(time * 0.01) * 0.1;
+        this.shieldGfx.setScale(pulseScale);
+      }
+
       if (time > this.shield.timer) {
         this.shield.active = false;
         this.shield.cooldownTimer = time + this.shield.cooldown;
         this.shieldGfx.setVisible(false);
+        // Reset shield graphics
+        this.shieldGfx.clear();
+        this.shieldGfx.setScale(1);
+        this.shieldGfx.lineStyle(4, COLORS.ACCENT);
+        this.shieldGfx.strokeCircle(0, 0, 30);
       }
     } else if (!this.shield.ready) {
       if (time > this.shield.cooldownTimer) {

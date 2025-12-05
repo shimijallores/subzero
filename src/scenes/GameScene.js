@@ -8,6 +8,7 @@ import TextureGenerator from "../utils/TextureGenerator.js";
 import BackgroundManager from "../managers/BackgroundManager.js";
 import UIManager from "../managers/UIManager.js";
 import SpawnManager from "../managers/SpawnManager.js";
+import UpgradeManager from "../managers/UpgradeManager.js";
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -85,6 +86,10 @@ export default class GameScene extends Phaser.Scene {
     // Spawner
     this.spawnManager = new SpawnManager(this);
 
+    // Upgrades
+    this.upgradeManager = new UpgradeManager(this);
+    this.upgradeManager.create();
+
     // Game State
     this.score = 0;
 
@@ -150,9 +155,13 @@ export default class GameScene extends Phaser.Scene {
   }
 
   update(time, delta) {
+    // Skip update if showing upgrades
+    if (this.upgradeManager.isShowingUpgrades) return;
+
     this.backgroundManager.update();
     this.player.update(time, delta);
     this.spawnManager.update(time, delta);
+    this.upgradeManager.update(time, delta);
     this.spawnManager.spawn(
       this.player,
       this.prisms,
@@ -176,6 +185,7 @@ export default class GameScene extends Phaser.Scene {
     if (this.player.lives <= 0) {
       this.music.stop();
       this.uiManager.hide();
+      this.upgradeManager.destroy();
       this.scene.start("GameOverScene", {
         score: this.score,
         playerName: this.playerName,
@@ -196,7 +206,7 @@ export default class GameScene extends Phaser.Scene {
         COLORS.WHITE_STRING
       );
     } else {
-      this.uiManager.updateOverdriveStatus("READY [TAB]", COLORS.ACCENT_STRING);
+      this.uiManager.updateOverdriveStatus("READY [F]", COLORS.ACCENT_STRING);
     }
 
     // Shield

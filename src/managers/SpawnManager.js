@@ -47,6 +47,17 @@ export default class SpawnManager {
       this.scene.uiManager.showNextRound(this.currentRound);
     }
 
+    // Trigger upgrade selection every 3 rounds
+    if (
+      this.scene.upgradeManager &&
+      this.scene.upgradeManager.shouldShowUpgrades(this.currentRound)
+    ) {
+      // Delay slightly to let round announcement show first
+      this.scene.time.delayedCall(1500, () => {
+        this.scene.upgradeManager.showUpgradeSelection();
+      });
+    }
+
     this.scene.addScore(500 * this.currentRound);
   }
 

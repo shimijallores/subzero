@@ -279,6 +279,6 @@ export default class MainMenuScene extends Phaser.Scene {
   startGame() {
     const nameElement = this.nameInput.getChildByName("nameField");
     const name = nameElement.value.trim() || "PILOT";
-    this.scene.start("GameScene", { playerName: name });
+    this.scene.start("StoryScene", { playerName: name });
   }
 }

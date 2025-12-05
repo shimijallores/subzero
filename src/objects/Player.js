@@ -236,6 +236,11 @@ export default class Player extends Phaser.GameObjects.Triangle {
         this.shield.ready = false;
         this.shield.timer = time + this.shield.duration;
         this.shieldGfx.setVisible(true);
+        this.scene.sound.play("shield", {
+          volume: 0.4,
+          detune: 1200,
+          rate: 2,
+        });
       }
     }
 
@@ -259,6 +264,11 @@ export default class Player extends Phaser.GameObjects.Triangle {
       this.dash.ready = false;
       this.dash.timer = time + this.dash.duration;
       this.dash.cooldownTimer = time + this.dash.cooldown;
+      this.scene.sound.play("dash", {
+        volume: 0.4,
+        detune: 1200,
+        rate: 2,
+      });
 
       const angle = this.rotation - Math.PI / 2;
       this.body.setMaxVelocity(this.dash.speed);

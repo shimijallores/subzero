@@ -17,8 +17,8 @@ export default class SpawnManager {
     this.currentRound = 1;
     this.roundTimer = 30000;
     this.roundDuration = 30000;
-    this.enemyCap = 5;
-    this.meteorCap = 10;
+    this.enemyCap = 10;
+    this.meteorCap = 20;
   }
 
   update(time, delta) {

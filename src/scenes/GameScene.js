@@ -20,6 +20,8 @@ export default class GameScene extends Phaser.Scene {
 
   preload() {
     this.load.audio("laser", "assets/sounds/laser.mp3");
+    this.load.audio("dash", "assets/sounds/dash.mp3");
+    this.load.audio("shield", "assets/sounds/shield.mp3");
     this.load.audio("damage", "assets/sounds/damage.mp3");
     this.load.audio("enemy-hit", "assets/sounds/enemy-hit.mp3");
     this.load.audio("background", "assets/sounds/background.mp3");

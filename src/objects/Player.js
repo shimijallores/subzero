@@ -11,6 +11,9 @@ export default class Player extends Phaser.GameObjects.Triangle {
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
+    // Hide base triangle - we use custom graphics for shape
+    this.setAlpha(0);
+
     this.setOrigin(0.5);
     this.body.setDrag(100);
     this.body.setMaxVelocity(200);
@@ -34,6 +37,10 @@ export default class Player extends Phaser.GameObjects.Triangle {
 
     // Base fire rate for upgrade calculations
     this.baseFireRate = 200;
+
+    // Shape evolution - starts as triangle (3 sides)
+    this.shapeSides = 3;
+    this.shapeSize = 12;
 
     // Input
     this.cursors = scene.input.keyboard.createCursorKeys();
@@ -95,6 +102,10 @@ export default class Player extends Phaser.GameObjects.Triangle {
   }
 
   setupVisuals() {
+    // Player shape graphics (drawn on top of base triangle)
+    this.shapeGfx = this.scene.add.graphics();
+    this.drawPlayerShape();
+
     // Particles
     this.emitter = this.scene.add.particles(0, 0, "particle", {
       lifespan: 600,
@@ -110,10 +121,61 @@ export default class Player extends Phaser.GameObjects.Triangle {
 
     // Time-Clone Ghost
     this.ghost = this.scene.add.graphics();
-    this.ghost.lineStyle(2, COLORS.ACCENT, 0.5);
-    this.ghost.strokeTriangle(0, 20, 10, 0, 20, 20);
+    this.drawGhostShape();
     this.ghost.x = this.x;
     this.ghost.y = this.y;
+  }
+
+  drawPlayerShape() {
+    this.shapeGfx.clear();
+    this.shapeGfx.fillStyle(COLORS.WHITE, 1);
+    this.shapeGfx.lineStyle(2, COLORS.ACCENT, 1);
+
+    const points = this.getPolygonPoints(0, 0, this.shapeSize, this.shapeSides);
+    this.shapeGfx.fillPoints(points, true);
+    this.shapeGfx.strokePoints(points, true);
+  }
+
+  drawGhostShape() {
+    this.ghost.clear();
+    this.ghost.lineStyle(2, COLORS.ACCENT, 0.5);
+    const points = this.getPolygonPoints(0, 0, this.shapeSize, this.shapeSides);
+    this.ghost.strokePoints(points, true);
+  }
+
+  getPolygonPoints(cx, cy, radius, sides) {
+    const points = [];
+    const angleStep = (Math.PI * 2) / sides;
+    // Start from top (-90 degrees)
+    const startAngle = -Math.PI / 2;
+
+    for (let i = 0; i < sides; i++) {
+      const angle = startAngle + i * angleStep;
+      points.push(
+        new Phaser.Geom.Point(
+          cx + Math.cos(angle) * radius,
+          cy + Math.sin(angle) * radius
+        )
+      );
+    }
+    return points;
+  }
+
+  evolveShape() {
+    this.shapeSides++;
+    this.shapeSize += 2; // Grow slightly with each evolution
+    this.drawPlayerShape();
+    this.drawGhostShape();
+
+    // Visual feedback for evolution
+    this.scene.tweens.add({
+      targets: this.shapeGfx,
+      scaleX: 1.5,
+      scaleY: 1.5,
+      duration: 150,
+      yoyo: true,
+      ease: "Quad.easeOut",
+    });
   }
 
   update(time, delta) {
@@ -346,20 +408,13 @@ export default class Player extends Phaser.GameObjects.Triangle {
   }
 
   createDashTrail() {
-    const ghost = this.scene.add.triangle(
-      this.x,
-      this.y,
-      0,
-      20,
-      10,
-      0,
-      20,
-      20,
-      COLORS.WHITE
-    );
-    ghost.setOrigin(0.5);
+    const ghost = this.scene.add.graphics();
+    ghost.fillStyle(COLORS.WHITE, 0.5);
+    const points = this.getPolygonPoints(0, 0, this.shapeSize, this.shapeSides);
+    ghost.fillPoints(points, true);
+    ghost.setPosition(this.x, this.y);
     ghost.rotation = this.rotation;
-    ghost.alpha = 0.5;
+
     this.scene.tweens.add({
       targets: ghost,
       alpha: 0,
@@ -369,6 +424,10 @@ export default class Player extends Phaser.GameObjects.Triangle {
   }
 
   updateVisuals() {
+    // Update shape graphics position and rotation
+    this.shapeGfx.setPosition(this.x, this.y);
+    this.shapeGfx.rotation = this.rotation;
+
     // Ghost flickers
     if (Math.random() > 0.9) {
       this.ghost.alpha = Math.random();

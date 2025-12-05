@@ -203,6 +203,9 @@ export default class UpgradeManager {
     // Execute upgrade effect
     upgrade.effect(this.scene.player, newLevel);
 
+    // Evolve player shape (add one side)
+    this.scene.player.evolveShape();
+
     // Update upgrades display
     this.updateUpgradesDisplay();
 
@@ -232,7 +235,8 @@ export default class UpgradeManager {
       }));
 
     if (activeUpgrades.length === 0) {
-      this.upgradesList.innerHTML = '<div style="color: #666; font-size: 11px;">No upgrades yet</div>';
+      this.upgradesList.innerHTML =
+        '<div style="color: #666; font-size: 11px;">No upgrades yet</div>';
       return;
     }
 
